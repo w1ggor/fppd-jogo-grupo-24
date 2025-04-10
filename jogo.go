@@ -2,7 +2,6 @@
 package main
 
 import (
-	"fmt"
 	"bufio"
 	"os"
 )
@@ -106,10 +105,4 @@ func jogoMoverElemento(jogo *Jogo, x, y, dx, dy int) {
 	jogo.Mapa[y][x] = jogo.UltimoVisitado     // restaura o conteúdo anterior
 	jogo.UltimoVisitado = jogo.Mapa[ny][nx]   // guarda o conteúdo atual da nova posição
 	jogo.Mapa[ny][nx] = elemento              // move o elemento
-}
-
-// Define o que ocorre quando o jogador
-func jogoInteragir(jogo *Jogo) {
-	// Atualmente apenas exibe uma mensagem de status
-	jogo.StatusMsg = fmt.Sprintf("Interagindo em (%d, %d)", jogo.PosX, jogo.PosY)
 }
