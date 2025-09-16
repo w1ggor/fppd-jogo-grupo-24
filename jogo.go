@@ -18,6 +18,8 @@ type Elemento struct {
 type Jogo struct {
 	Mapa                       [][]Elemento // grade 2D representando o mapa
 	Pos1X, Pos1Y, Pos2X, Pos2Y int          // posição atual do personagem
+	IniFogoPosX, IniFogoPosY   int          // posição atual do inimigo de fogo
+	IniAguaPosX, IniAguaPosY   int          // posição atual do inimigo de fogo
 	UltimoVisitado             Elemento     // elemento que estava na posição do personagem antes de mover
 	StatusMsg                  string       // mensagem para a barra de status
 }
@@ -27,6 +29,9 @@ var (
 	PersonagemFogo = Elemento{'○', CorVermelho, CorPadrao, true}
 	PersonagemAgua = Elemento{'●', CorAzul, CorPadrao, true}
 	Inimigo        = Elemento{'☠', CorVermelho, CorPadrao, true}
+	Personagem     = Elemento{'☺', CorCinzaEscuro, CorPadrao, true}
+	InimigoFogo    = Elemento{'◇', CorVermelho, CorPadrao, true}
+	InimigoAgua    = Elemento{'◆', CorAzul, CorPadrao, true}
 	Parede         = Elemento{'▤', CorParede, CorFundoParede, true}
 	Vegetacao      = Elemento{'♣', CorVerde, CorPadrao, false}
 	Vazio          = Elemento{' ', CorPadrao, CorPadrao, false}
@@ -57,8 +62,10 @@ func jogoCarregarMapa(nome string, jogo *Jogo) error {
 			switch ch {
 			case Parede.simbolo:
 				e = Parede
-			case Inimigo.simbolo:
-				e = Inimigo
+			case InimigoFogo.simbolo:
+				e = InimigoFogo
+			case InimigoAgua.simbolo:
+				e = InimigoAgua
 			case Vegetacao.simbolo:
 				e = Vegetacao
 			case PersonagemFogo.simbolo:
