@@ -1,24 +1,31 @@
 // personagem.go - Funções para movimentação e ações do personagem
 package main
 
-import "fmt"
+import (
+	"fmt"
+)
 
 // Atualiza a posição do personagem com base na tecla pressionada (WASD)
-func personagemMover(tecla rune, jogo *Jogo) {
-	dx, dy := 0, 0
-	switch tecla {
-	case 'w': dy = -1 // Move para cima
-	case 'a': dx = -1 // Move para a esquerda
-	case 's': dy = 1  // Move para baixo
-	case 'd': dx = 1  // Move para a direita
+func personagemMover(input InputData, jogo *Jogo, player int) {
+
+	dx, dy := input.dx, input.dy
+
+	if player == 0 {
+		nx, ny := jogo.Pos1X+dx, jogo.Pos1Y+dy
+		// Verifica se o movimento é permitido e realiza a movimentação
+		if jogoPodeMoverPara(jogo, nx, ny) {
+			jogoMoverElemento(jogo, jogo.Pos1X, jogo.Pos1Y, dx, dy)
+			jogo.Pos1X, jogo.Pos1Y = nx, ny
+		}
+	} else {
+		nx, ny := jogo.Pos2X+dx, jogo.Pos2Y+dy
+		// Verifica se o movimento é permitido e realiza a movimentação
+		if jogoPodeMoverPara(jogo, nx, ny) {
+			jogoMoverElemento(jogo, jogo.Pos2X, jogo.Pos2Y, dx, dy)
+			jogo.Pos2X, jogo.Pos2Y = nx, ny
+		}
 	}
 
-	nx, ny := jogo.PosX+dx, jogo.PosY+dy
-	// Verifica se o movimento é permitido e realiza a movimentação
-	if jogoPodeMoverPara(jogo, nx, ny) {
-		jogoMoverElemento(jogo, jogo.PosX, jogo.PosY, dx, dy)
-		jogo.PosX, jogo.PosY = nx, ny
-	}
 }
 
 // Define o que ocorre quando o jogador pressiona a tecla de interação
@@ -26,11 +33,32 @@ func personagemMover(tecla rune, jogo *Jogo) {
 // Você pode expandir essa função para incluir lógica de interação com objetos
 func personagemInteragir(jogo *Jogo) {
 	// Atualmente apenas exibe uma mensagem de status
-	jogo.StatusMsg = fmt.Sprintf("Interagindo em (%d, %d)", jogo.PosX, jogo.PosY)
+	jogo.StatusMsg = fmt.Sprintf("Interagindo em (%d, %d)", jogo.Pos1X, jogo.Pos1Y)
+}
+
+var player1Input = make(chan InputData)
+var player2Input = make(chan InputData)
+
+func recebeInput(player int, jogo *Jogo) {
+
+	if player == 0 {
+		for {
+			var input = <-player1Input
+			personagemMover(input, jogo, 0)
+		}
+
+	} else {
+		for {
+
+			var input = <-player2Input
+			personagemMover(input, jogo, 1)
+		}
+	}
 }
 
 // Processa o evento do teclado e executa a ação correspondente
 func personagemExecutarAcao(ev EventoTeclado, jogo *Jogo) bool {
+	var input = InputData{player: 0, input: ev, dx: 0, dy: 0}
 	switch ev.Tipo {
 	case "sair":
 		// Retorna false para indicar que o jogo deve terminar
@@ -40,7 +68,38 @@ func personagemExecutarAcao(ev EventoTeclado, jogo *Jogo) bool {
 		personagemInteragir(jogo)
 	case "mover":
 		// Move o personagem com base na tecla
-		personagemMover(ev.Tecla, jogo)
+		switch ev.Tecla {
+		case 'w':
+			input.player = 0
+			input.dy = -1 // Move para cima
+		case 'a':
+			input.player = 0
+			input.dx = -1 // Move para a esquerda
+		case 's':
+			input.player = 0
+			input.dy = 1 // Move para baixo
+		case 'd':
+			input.player = 0
+			input.dx = 1 // Move para a direita
+		case 'i':
+			input.player = 1
+			input.dy = -1 // Move para cima
+		case 'j':
+			input.player = 1
+			input.dx = -1 // Move para a esquerda
+		case 'k':
+			input.player = 1
+			input.dy = 1 // Move para baixo
+		case 'l':
+			input.player = 1
+			input.dx = 1
+		}
+
+		if input.player == 0 {
+			player1Input <- input
+		} else {
+			player2Input <- input
+		}
 	}
 	return true // Continua o jogo
 }

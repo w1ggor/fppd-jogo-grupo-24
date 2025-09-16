@@ -3,6 +3,12 @@ package main
 
 import "os"
 
+type InputData struct {
+	player int
+	input  EventoTeclado
+	dx, dy int
+}
+
 func main() {
 	// Inicializa a interface (termbox)
 	interfaceIniciar()
@@ -23,6 +29,8 @@ func main() {
 	// Desenha o estado inicial do jogo
 	interfaceDesenharJogo(&jogo)
 
+	go recebeInput(0, &jogo)
+	go recebeInput(1, &jogo)
 	// Loop principal de entrada
 	for {
 		evento := interfaceLerEventoTeclado()
