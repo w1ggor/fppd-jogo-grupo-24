@@ -17,6 +17,7 @@ const (
 	CorPadrao      Cor = termbox.ColorDefault
 	CorCinzaEscuro     = termbox.ColorDarkGray
 	CorVermelho        = termbox.ColorRed
+	CorAzul            = termbox.ColorBlue
 	CorVerde           = termbox.ColorGreen
 	CorParede          = termbox.ColorBlack | termbox.AttrBold | termbox.AttrDim
 	CorFundoParede     = termbox.ColorDarkGray
@@ -68,8 +69,8 @@ func interfaceDesenharJogo(jogo *Jogo) {
 	}
 
 	// Desenha o personagem sobre o mapa
-	interfaceDesenharElemento(jogo.Pos1X, jogo.Pos1Y, Personagem1)
-	interfaceDesenharElemento(jogo.Pos2X, jogo.Pos2Y, Personagem2)
+	interfaceDesenharElemento(jogo.Pos1X, jogo.Pos1Y, PersonagemFogo)
+	interfaceDesenharElemento(jogo.Pos2X, jogo.Pos2Y, PersonagemAgua)
 	// Desenha a barra de status
 	interfaceDesenharBarraDeStatus(jogo)
 

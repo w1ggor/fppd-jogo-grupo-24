@@ -24,12 +24,12 @@ type Jogo struct {
 
 // Elementos visuais do jogo
 var (
-	Personagem1 = Elemento{'◇', CorCinzaEscuro, CorPadrao, true}
-	Personagem2 = Elemento{'◆', CorCinzaEscuro, CorPadrao, true}
-	Inimigo     = Elemento{'☠', CorVermelho, CorPadrao, true}
-	Parede      = Elemento{'▤', CorParede, CorFundoParede, true}
-	Vegetacao   = Elemento{'♣', CorVerde, CorPadrao, false}
-	Vazio       = Elemento{' ', CorPadrao, CorPadrao, false}
+	PersonagemFogo = Elemento{'○', CorVermelho, CorPadrao, true}
+	PersonagemAgua = Elemento{'●', CorAzul, CorPadrao, true}
+	Inimigo        = Elemento{'☠', CorVermelho, CorPadrao, true}
+	Parede         = Elemento{'▤', CorParede, CorFundoParede, true}
+	Vegetacao      = Elemento{'♣', CorVerde, CorPadrao, false}
+	Vazio          = Elemento{' ', CorPadrao, CorPadrao, false}
 )
 
 // Cria e retorna uma nova instância do jogo
@@ -61,9 +61,9 @@ func jogoCarregarMapa(nome string, jogo *Jogo) error {
 				e = Inimigo
 			case Vegetacao.simbolo:
 				e = Vegetacao
-			case Personagem1.simbolo:
+			case PersonagemFogo.simbolo:
 				jogo.Pos1X, jogo.Pos1Y = x, y
-			case Personagem2.simbolo:
+			case PersonagemAgua.simbolo:
 				jogo.Pos2X, jogo.Pos2Y = x, y // registra a posição inicial do personagem
 			}
 			linhaElems = append(linhaElems, e)
