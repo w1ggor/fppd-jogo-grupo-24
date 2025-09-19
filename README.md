@@ -63,3 +63,49 @@ Também é possivel compilar o projeto usando o comando `make` no Linux ou o scr
 - personagem.go — Ações do jogador
 
 
+## Alterações feitas durante o trabalho
+
+### Foi adicionado um canal para sincronizar a mudança do mapa
+Fizemos a sincronização da atualização do mapa via um canal com buffer de tamanho 1, garantindo assim que apenas um elemento pode atualizar o mapa por vez.
+
+<details>
+<summary>Adicionamos uma struct com as informações necessárias para atualizar o mapa</summary>
+
+```go
+//jogo.go
+type MoverElementoType struct {
+	jogo         *Jogo
+	x, y, dx, dy int
+}
+```
+</details>
+
+<details>
+<summary>Depois criamos um canal que vai receber estas informações.</summary>
+
+```go
+//jogo.go
+var moveElemento = make(chan MoverElementoType, 1)
+```
+</details>
+
+<details>
+<summary>Então removemos os parâmetros da função "jogoMoverElemento", agora recebendo estas informações através do canal "moveElemento".</summary>
+
+```go
+// jogo.go
+func jogoMoverElemento() {
+	for {
+		var moveInput = <-moveElemento
+		var jogo = moveInput.jogo
+		var x, y, dx, dy = moveInput.x, moveInput.y, moveInput.dx, moveInput.dy
+		nx, ny := x+dx, y+dy
+	
+		elemento := jogo.Mapa[y][x] 
+		jogo.Mapa[y][x] = jogo.UltimoVisitado  
+		jogo.UltimoVisitado = jogo.Mapa[ny][nx] 
+		jogo.Mapa[ny][nx] = elemento
+	}
+}
+```
+</details>

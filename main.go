@@ -9,11 +9,6 @@ type InputData struct {
 	dx, dy int
 }
 
-type MoverElementoType struct {
-	jogo         *Jogo
-	x, y, dx, dy int
-}
-
 func main() {
 	// Inicializa a interface (termbox)
 	interfaceIniciar()

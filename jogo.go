@@ -13,6 +13,10 @@ type Elemento struct {
 	corFundo Cor
 	tangivel bool // Indica se o elemento bloqueia passagem
 }
+type MoverElementoType struct {
+	jogo         *Jogo
+	x, y, dx, dy int
+}
 
 // Jogo contém o estado atual do jogo
 type Jogo struct {
@@ -122,6 +126,5 @@ func jogoMoverElemento() {
 		jogo.UltimoVisitado = jogo.Mapa[ny][nx] // guarda o conteúdo atual da nova posição
 		jogo.Mapa[ny][nx] = elemento
 	}
-	// move o elemento
 
 }
