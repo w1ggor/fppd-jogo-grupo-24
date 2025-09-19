@@ -105,14 +105,23 @@ func jogoPodeMoverPara(jogo *Jogo, x, y int) bool {
 	return true
 }
 
+var moveElemento = make(chan MoverElementoType, 1)
+
 // Move um elemento para a nova posição
-func jogoMoverElemento(jogo *Jogo, x, y, dx, dy int) {
-	nx, ny := x+dx, y+dy
+func jogoMoverElemento() {
+	for {
+		var moveInput = <-moveElemento
+		var jogo = moveInput.jogo
+		var x, y, dx, dy = moveInput.x, moveInput.y, moveInput.dx, moveInput.dy
+		nx, ny := x+dx, y+dy
 
-	// Obtem elemento atual na posição
-	elemento := jogo.Mapa[y][x] // guarda o conteúdo atual da posição
+		// Obtem elemento atual na posição
+		elemento := jogo.Mapa[y][x] // guarda o conteúdo atual da posição
 
-	jogo.Mapa[y][x] = jogo.UltimoVisitado   // restaura o conteúdo anterior
-	jogo.UltimoVisitado = jogo.Mapa[ny][nx] // guarda o conteúdo atual da nova posição
-	jogo.Mapa[ny][nx] = elemento            // move o elemento
+		jogo.Mapa[y][x] = jogo.UltimoVisitado   // restaura o conteúdo anterior
+		jogo.UltimoVisitado = jogo.Mapa[ny][nx] // guarda o conteúdo atual da nova posição
+		jogo.Mapa[ny][nx] = elemento
+	}
+	// move o elemento
+
 }

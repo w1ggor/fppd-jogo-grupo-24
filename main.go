@@ -9,6 +9,11 @@ type InputData struct {
 	dx, dy int
 }
 
+type MoverElementoType struct {
+	jogo         *Jogo
+	x, y, dx, dy int
+}
+
 func main() {
 	// Inicializa a interface (termbox)
 	interfaceIniciar()
@@ -31,6 +36,7 @@ func main() {
 
 	go recebeInput(0, &jogo)
 	go recebeInput(1, &jogo)
+	go jogoMoverElemento()
 	// Loop principal de entrada
 	for {
 		evento := interfaceLerEventoTeclado()
