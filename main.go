@@ -49,16 +49,12 @@ func main() {
 			if jogo.IniAguaPosX == jogo.Pos1X && jogo.IniAguaPosY == jogo.Pos1Y {
 				// Volta personagem de fogo para posição inicial
 				// Procura posição inicial no mapa
-				personagemMover(InputData{player: 0, dx: jogo.PosCo1X - jogo.Pos1X, dy: jogo.PosCo1Y - jogo.Pos1Y}, &jogo, 0) // Atualiza posição na tela
-
-				jogo.StatusMsg = "Fogo apagou!"
+				apagarFogo(&jogo)
 			}
 			// Verifica colisão inimigo de fogo com personagem de água
 			if jogo.IniFogoPosX == jogo.Pos2X && jogo.IniFogoPosY == jogo.Pos2Y {
 				// Volta personagem de água para posição inicial
-				personagemMover(InputData{player: 1, dx: jogo.PosCo2X - jogo.Pos2X, dy: jogo.PosCo2Y - jogo.Pos2Y}, &jogo, 1) // Atualiza posição na tela
-
-				jogo.StatusMsg = "Agua ferveu!"
+				evaporarAgua(&jogo)
 			}
 			interfaceDesenharJogo(&jogo)
 			time.Sleep(50 * time.Millisecond)

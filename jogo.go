@@ -42,6 +42,8 @@ var (
 	Parede         = Elemento{'▤', CorParede, CorFundoParede, true}
 	Vegetacao      = Elemento{'♣', CorVerde, CorPadrao, false}
 	Vazio          = Elemento{' ', CorPadrao, CorPadrao, false}
+	Fogo           = Elemento{'^', CorVermelho, CorPadrao, false}
+	Agua           = Elemento{'~', CorAzul, CorPadrao, false}
 )
 
 // Cria e retorna uma nova instância do jogo
@@ -82,7 +84,11 @@ func jogoCarregarMapa(nome string, jogo *Jogo) error {
 				jogo.Pos1X, jogo.Pos1Y = x, y
 			case PersonagemAgua.simbolo:
 				jogo.PosCo2X, jogo.PosCo2Y = x, y
-				jogo.Pos2X, jogo.Pos2Y = x, y // registra a posição inicial do personagem
+				jogo.Pos2X, jogo.Pos2Y = x, y // registra a posição inicial do personagem                             // remove o símbolo do inimigo do mapa
+			case Fogo.simbolo:
+				e = Fogo
+			case Agua.simbolo:
+				e = Agua
 			}
 			linhaElems = append(linhaElems, e)
 		}
@@ -96,7 +102,7 @@ func jogoCarregarMapa(nome string, jogo *Jogo) error {
 }
 
 // Verifica se o personagem pode se mover para a posição (x, y)
-func jogoPodeMoverPara(jogo *Jogo, x, y int) bool {
+func jogoPodeMoverPara(jogo *Jogo, x, y int, player ...int) bool {
 	// Verifica se a coordenada Y está dentro dos limites verticais do mapa
 	if y < 0 || y >= len(jogo.Mapa) {
 		return false
@@ -109,6 +115,16 @@ func jogoPodeMoverPara(jogo *Jogo, x, y int) bool {
 
 	// Verifica se o elemento de destino é tangível (bloqueia passagem)
 	if jogo.Mapa[y][x].tangivel {
+		return false
+	}
+
+	// Verifica se o elemento de destino é tangível (bloqueia passagem)
+	if jogo.Mapa[y][x].simbolo == Agua.simbolo && player != nil && player[0] == 0 {
+		apagarFogo(jogo)
+		return false
+	}
+	if jogo.Mapa[y][x].simbolo == Fogo.simbolo && player != nil && player[0] == 1 {
+		evaporarAgua(jogo)
 		return false
 	}
 

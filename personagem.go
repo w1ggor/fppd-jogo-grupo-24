@@ -13,7 +13,7 @@ func personagemMover(input InputData, jogo *Jogo, player int) {
 	if player == 0 {
 		nx, ny := jogo.Pos1X+dx, jogo.Pos1Y+dy
 		// Verifica se o movimento é permitido e realiza a movimentação
-		if jogoPodeMoverPara(jogo, nx, ny) {
+		if jogoPodeMoverPara(jogo, nx, ny, player) {
 			var moveInput = MoverElementoType{player: 0, jogo: jogo, x: jogo.Pos1X, y: jogo.Pos1Y, dx: dx, dy: dy}
 			moveElemento <- moveInput
 			jogo.Pos1X, jogo.Pos1Y = nx, ny
@@ -21,8 +21,8 @@ func personagemMover(input InputData, jogo *Jogo, player int) {
 	} else {
 		nx, ny := jogo.Pos2X+dx, jogo.Pos2Y+dy
 		// Verifica se o movimento é permitido e realiza a movimentação
-		if jogoPodeMoverPara(jogo, nx, ny) {
-			var moveInput = MoverElementoType{player: 1,jogo: jogo, x: jogo.Pos2X, y: jogo.Pos2Y, dx: dx, dy: dy}
+		if jogoPodeMoverPara(jogo, nx, ny, player) {
+			var moveInput = MoverElementoType{player: 1, jogo: jogo, x: jogo.Pos2X, y: jogo.Pos2Y, dx: dx, dy: dy}
 			moveElemento <- moveInput
 			jogo.Pos2X, jogo.Pos2Y = nx, ny
 		}
@@ -104,4 +104,30 @@ func personagemExecutarAcao(ev EventoTeclado, jogo *Jogo) bool {
 		}
 	}
 	return true // Continua o jogo
+}
+
+func apagarFogo(jogo *Jogo) {
+	// Salva o elemento atual para restaurar depois
+	elementoAtual := jogo.Mapa[jogo.Pos1Y][jogo.Pos1X]
+	
+	// Move o personagem para a posição inicial
+	jogo.Mapa[jogo.Pos1Y][jogo.Pos1X] = jogo.UltimoVisitado1
+	jogo.Pos1X, jogo.Pos1Y = jogo.PosCo1X, jogo.PosCo1Y
+	jogo.UltimoVisitado1 = jogo.Mapa[jogo.Pos1Y][jogo.Pos1X]
+	jogo.Mapa[jogo.Pos1Y][jogo.Pos1X] = elementoAtual
+
+	jogo.StatusMsg = "Fogo apagou!"
+}
+
+func evaporarAgua(jogo *Jogo) {
+	// Salva o elemento atual para restaurar depois
+	elementoAtual := jogo.Mapa[jogo.Pos2Y][jogo.Pos2X]
+	
+	// Move o personagem para a posição inicial
+	jogo.Mapa[jogo.Pos2Y][jogo.Pos2X] = jogo.UltimoVisitado2
+	jogo.Pos2X, jogo.Pos2Y = jogo.PosCo2X, jogo.PosCo2Y
+	jogo.UltimoVisitado2 = jogo.Mapa[jogo.Pos2Y][jogo.Pos2X]
+	jogo.Mapa[jogo.Pos2Y][jogo.Pos2X] = elementoAtual
+
+	jogo.StatusMsg = "Agua evaporou!"
 }
