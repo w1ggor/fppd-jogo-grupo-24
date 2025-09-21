@@ -65,6 +65,17 @@ Também é possivel compilar o projeto usando o comando `make` no Linux ou o scr
 
 ## Alterações feitas durante o trabalho
 
+### Adição de inimigos com patrulha automática e canais concorrentes
+
+Foram implementados dois inimigos no jogo: o inimigo de fogo (◇) e o inimigo de água (◆). Cada inimigo se move automaticamente pelo mapa, patrulhando de um lado para o outro.
+
+- **Canais concorrentes:** Cada inimigo escuta dois canais: um canal de patrulha (para receber comandos de movimento) e um canal de alerta (para receber sinais de proximidade do personagem). Isso garante escuta concorrente de múltiplos canais.
+- **Aceleração por proximidade:** Se o personagem de fogo se aproxima do inimigo de água, ou o personagem de água se aproxima do inimigo de fogo, o respectivo inimigo acelera sua movimentação automaticamente.
+- **Colisão:** Se o inimigo de água encostar no personagem de fogo, o personagem de fogo retorna para sua posição inicial e a mensagem "Fogo apagou!" aparece na barra de status. Se o inimigo de fogo encostar no personagem de água, o personagem de água retorna para sua posição inicial e a mensagem "Agua ferveu!" aparece na barra de status.
+- **Sincronização:** Toda movimentação dos inimigos também é feita via canal, garantindo concorrência segura.
+
+Essas alterações demonstram comunicação entre elementos do jogo por canais, escuta concorrente e lógica reativa baseada em eventos do ambiente.
+
 ### Foi adicionado um canal para sincronizar a mudança do mapa
 Fizemos a sincronização da atualização do mapa via um canal com buffer de tamanho 1, garantindo assim que apenas um elemento pode atualizar o mapa por vez.
 
