@@ -22,17 +22,18 @@ type MoverElementoType struct {
 
 // Jogo contém o estado atual do jogo
 type Jogo struct {
-	Mapa                       [][]Elemento // grade 2D representando o mapa
-	Pos1X, Pos1Y, Pos2X, Pos2Y int          // posição atual do personagem
-	IniFogoPosX, IniFogoPosY   int          // posição atual do inimigo de fogo
-	IniAguaPosX, IniAguaPosY   int          // posição atual do inimigo de fogo
-	UltimoVisitado1            Elemento     // elemento que estava na posição do personagem antes de mover
-	UltimoVisitado2            Elemento
-	PosPortao1XF, PosPortao1YF   int
-	PosPortao2XF, PosPortao2YF   int
-	PosPortao1XA, PosPortao1YA   int
-	PosPortao2XA, PosPortao2YA   int
-	StatusMsg                  string // mensagem para a barra de status
+	Mapa                               [][]Elemento // grade 2D representando o mapa
+	PosCo1X, PosCo1Y, PosCo2X, PosCo2Y int          // posição do comeco do personagem
+	Pos1X, Pos1Y, Pos2X, Pos2Y         int          // posição atual do personagem
+	IniFogoPosX, IniFogoPosY           int          // posição atual do inimigo de fogo
+	IniAguaPosX, IniAguaPosY           int          // posição atual do inimigo de fogo
+	UltimoVisitado1                    Elemento     // elemento que estava na posição do personagem antes de mover
+	UltimoVisitado2                    Elemento
+	PosPortao1XF, PosPortao1YF         int
+	PosPortao2XF, PosPortao2YF         int
+	PosPortao1XA, PosPortao1YA         int
+	PosPortao2XA, PosPortao2YA         int
+	StatusMsg                          string // mensagem para a barra de status
 }
 
 // Elementos visuais do jogo
@@ -76,9 +77,11 @@ func jogoCarregarMapa(nome string, jogo *Jogo) error {
 			case Parede.simbolo:
 				e = Parede
 			case InimigoFogo.simbolo:
-				e = InimigoFogo
+				jogo.IniFogoPosX, jogo.IniFogoPosY = x, y // registra a posição inicial do inimigo de fogo
+				e = Vazio                                 // remove o símbolo do inimigo do mapa
 			case InimigoAgua.simbolo:
-				e = InimigoAgua
+				jogo.IniAguaPosX, jogo.IniAguaPosY = x, y // registra a posição inicial do inimigo de água
+				e = Vazio                                 // remove o símbolo do inimigo do mapa
 			case Portao.simbolo:
 				e = Portao
 			case Botao.simbolo:
@@ -86,8 +89,10 @@ func jogoCarregarMapa(nome string, jogo *Jogo) error {
 			case Vegetacao.simbolo:
 				e = Vegetacao
 			case PersonagemFogo.simbolo:
+				jogo.PosCo1X, jogo.PosCo1Y = x, y
 				jogo.Pos1X, jogo.Pos1Y = x, y
 			case PersonagemAgua.simbolo:
+				jogo.PosCo2X, jogo.PosCo2Y = x, y
 				jogo.Pos2X, jogo.Pos2Y = x, y // registra a posição inicial do personagem
 			}
 			linhaElems = append(linhaElems, e)

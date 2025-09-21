@@ -73,7 +73,10 @@ func interfaceDesenharJogo(jogo *Jogo) {
 		// Desenha o personagem sobre o mapa
 		interfaceDesenharElemento(jogo.Pos1X, jogo.Pos1Y, PersonagemFogo)
 		interfaceDesenharElemento(jogo.Pos2X, jogo.Pos2Y, PersonagemAgua)
-		// Desenha a barra de status
+		// Desenha os inimigos sobre o mapa
+	interfaceDesenharElemento(jogo.IniFogoPosX, jogo.IniFogoPosY, InimigoFogo)
+	interfaceDesenharElemento(jogo.IniAguaPosX, jogo.IniAguaPosY, InimigoAgua)
+	// Desenha a barra de status
 		interfaceDesenharBarraDeStatus(jogo)
 		// Desenha o portao abrindo
 		interfaceDesenharElemento(jogo.PosPortao1XA, jogo.PosPortao1YA, Vazio)

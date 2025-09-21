@@ -22,7 +22,7 @@ func personagemMover(input InputData, jogo *Jogo, player int) {
 		nx, ny := jogo.Pos2X+dx, jogo.Pos2Y+dy
 		// Verifica se o movimento é permitido e realiza a movimentação
 		if jogoPodeMoverPara(jogo, nx, ny) {
-			var moveInput = MoverElementoType{player: 1,jogo: jogo, x: jogo.Pos2X, y: jogo.Pos2Y, dx: dx, dy: dy}
+			var moveInput = MoverElementoType{player: 1, jogo: jogo, x: jogo.Pos2X, y: jogo.Pos2Y, dx: dx, dy: dy}
 			moveElemento <- moveInput
 			jogo.Pos2X, jogo.Pos2Y = nx, ny
 		}
