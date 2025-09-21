@@ -189,7 +189,7 @@ func abrirP1(jogo *Jogo, canalP1 chan int) {
 			canalP1 <- 1
 			return
 		}
-		//jogo.Mapa[py1][px1] = Vazio
+		jogo.Mapa[py1][px1] = Vazio
 		time.Sleep(time.Millisecond * 100)
 		jogo.PosPortao1XA, jogo.PosPortao1YA = px1, py1
 		px1--
@@ -205,7 +205,7 @@ func abrirP2(jogo *Jogo, canalP2 chan int) {
 			canalP2 <- 53
 			return
 		}
-		//jogo.Mapa[py2][px2] = Vazio
+		jogo.Mapa[py2][px2] = Vazio
 		time.Sleep(time.Millisecond * 100)
 		jogo.PosPortao2XA, jogo.PosPortao2YA = px2, py2
 		px2--
@@ -221,7 +221,7 @@ func fecharP1(jogo *Jogo, interromperP1 chan int) {
 			continue
 		}
 		for px1 < 26 {
-			//jogo.Mapa[py1][px1] = Portao
+			jogo.Mapa[py1][px1] = Portao
 			time.Sleep(time.Millisecond * 100)
 			jogo.PosPortao1XF, jogo.PosPortao1YF = px1, py1
 			px1++
@@ -240,7 +240,7 @@ func fecharP2(jogo *Jogo, interromperP2 chan int) {
 			continue
 		}
 		for px2 < 79 {
-			//jogo.Mapa[py2][px2] = Portao
+			jogo.Mapa[py2][px2] = Portao
 			time.Sleep(time.Millisecond * 100)
 			jogo.PosPortao2XF, jogo.PosPortao2YF = px2, py2
 			px2++

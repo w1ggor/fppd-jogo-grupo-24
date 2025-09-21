@@ -61,7 +61,6 @@ func interfaceLerEventoTeclado() EventoTeclado {
 
 // Renderiza todo o estado atual do jogo na tela
 func interfaceDesenharJogo(jogo *Jogo) {
-	for {
 		interfaceLimparTela()
 	
 		// Desenha todos os elementos do mapa
@@ -78,12 +77,13 @@ func interfaceDesenharJogo(jogo *Jogo) {
 		interfaceDesenharBarraDeStatus(jogo)
 		// Desenha o portao abrindo
 		interfaceDesenharElemento(jogo.PosPortao1XA, jogo.PosPortao1YA, Vazio)
+		interfaceDesenharElemento(jogo.PosPortao2XA, jogo.PosPortao2YA, Vazio)
 		// Desenha o portao fechando
 		interfaceDesenharElemento(jogo.PosPortao1XF, jogo.PosPortao1YF, Portao)
+		interfaceDesenharElemento(jogo.PosPortao2XF, jogo.PosPortao2YF, Portao)
 		// Força a atualização do terminal
 		interfaceAtualizarTela()
 		time.Sleep(time.Millisecond * 16)
-	}
 }
 
 // Limpa a tela do terminal
