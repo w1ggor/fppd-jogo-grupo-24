@@ -31,6 +31,7 @@ func main() {
 
 	go recebeInput(0, &jogo)
 	go recebeInput(1, &jogo)
+	go ativarBotoes(&jogo)
 	go jogoMoverElemento()
 	// Loop principal de entrada
 	for {

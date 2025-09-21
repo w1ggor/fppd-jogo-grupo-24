@@ -6,6 +6,8 @@
 package main
 
 import (
+	"time"
+
 	"github.com/nsf/termbox-go"
 )
 
@@ -59,23 +61,29 @@ func interfaceLerEventoTeclado() EventoTeclado {
 
 // Renderiza todo o estado atual do jogo na tela
 func interfaceDesenharJogo(jogo *Jogo) {
-	interfaceLimparTela()
-
-	// Desenha todos os elementos do mapa
-	for y, linha := range jogo.Mapa {
-		for x, elem := range linha {
-			interfaceDesenharElemento(x, y, elem)
+	for {
+		interfaceLimparTela()
+	
+		// Desenha todos os elementos do mapa
+		for y, linha := range jogo.Mapa {
+			for x, elem := range linha {
+				interfaceDesenharElemento(x, y, elem)
+			}
 		}
+	
+		// Desenha o personagem sobre o mapa
+		interfaceDesenharElemento(jogo.Pos1X, jogo.Pos1Y, PersonagemFogo)
+		interfaceDesenharElemento(jogo.Pos2X, jogo.Pos2Y, PersonagemAgua)
+		// Desenha a barra de status
+		interfaceDesenharBarraDeStatus(jogo)
+		// Desenha o portao abrindo
+		interfaceDesenharElemento(jogo.PosPortao1XA, jogo.PosPortao1YA, Vazio)
+		// Desenha o portao fechando
+		interfaceDesenharElemento(jogo.PosPortao1XF, jogo.PosPortao1YF, Portao)
+		// Força a atualização do terminal
+		interfaceAtualizarTela()
+		time.Sleep(time.Millisecond * 16)
 	}
-
-	// Desenha o personagem sobre o mapa
-	interfaceDesenharElemento(jogo.Pos1X, jogo.Pos1Y, PersonagemFogo)
-	interfaceDesenharElemento(jogo.Pos2X, jogo.Pos2Y, PersonagemAgua)
-	// Desenha a barra de status
-	interfaceDesenharBarraDeStatus(jogo)
-
-	// Força a atualização do terminal
-	interfaceAtualizarTela()
 }
 
 // Limpa a tela do terminal
