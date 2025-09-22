@@ -100,7 +100,7 @@ func jogoCarregarMapa(nome string, jogo *Jogo) error {
 				e = Fogo
 			case Agua.simbolo:
 				e = Agua
-				jogo.Pos2X, jogo.Pos2Y = x, y // registra a posição inicial do personagem
+
 			}
 			linhaElems = append(linhaElems, e)
 		}
@@ -163,7 +163,12 @@ func jogoMoverElemento() {
 		if jogo.Mapa[y][x].simbolo == Agua.simbolo || jogo.Mapa[y][x].simbolo == Fogo.simbolo {
 			continue
 		}
-
+		if jogo.Mapa[y][x].simbolo == Botao.simbolo || jogo.Mapa[ny][nx].simbolo == Botao.simbolo {
+			continue
+		}
+		if jogo.Mapa[y][x].simbolo == Portao.simbolo || jogo.Mapa[ny][nx].simbolo == Portao.simbolo {
+			continue
+		}
 		elemento := jogo.Mapa[y][x] // guarda o conteúdo atual da posição
 		if player == 0 {
 			// Só salva em UltimoVisitado1 se destino não for barreira

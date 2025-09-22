@@ -11,7 +11,7 @@ func inimigoMover(input InputData, jogo *Jogo, inimigo int) {
 		nx, ny := jogo.IniFogoPosX+fdx, jogo.IniFogoPosY+fdy
 		// Verifica se o movimento é permitido e realiza a movimentação
 		if jogoPodeMoverPara(jogo, nx, ny) {
-			var moveInput = MoverElementoType{jogo: jogo, x: jogo.IniFogoPosX, y: jogo.IniFogoPosY, dx: fdx, dy: fdy}
+			var moveInput = MoverElementoType{player: 4, jogo: jogo, x: jogo.IniFogoPosX, y: jogo.IniFogoPosY, dx: fdx, dy: fdy}
 			moveElemento <- moveInput
 			jogo.IniFogoPosX, jogo.IniFogoPosY = nx, ny
 		}
@@ -20,7 +20,7 @@ func inimigoMover(input InputData, jogo *Jogo, inimigo int) {
 		nx, ny := jogo.IniAguaPosX+adx, jogo.IniAguaPosY+ady
 		// Verifica se o movimento é permitido e realiza a movimentação
 		if jogoPodeMoverPara(jogo, nx, ny) {
-			var moveInput = MoverElementoType{jogo: jogo, x: jogo.IniAguaPosX, y: jogo.IniAguaPosY, dx: adx, dy: ady}
+			var moveInput = MoverElementoType{player: 4, jogo: jogo, x: jogo.IniAguaPosX, y: jogo.IniAguaPosY, dx: adx, dy: ady}
 			moveElemento <- moveInput
 			jogo.IniAguaPosX, jogo.IniAguaPosY = nx, ny
 		}
