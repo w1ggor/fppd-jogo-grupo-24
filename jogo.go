@@ -142,18 +142,31 @@ func jogoMoverElemento() {
 		var player, x, y, dx, dy = moveInput.player, moveInput.x, moveInput.y, moveInput.dx, moveInput.dy
 		nx, ny := x+dx, y+dy
 
-		// Obtem elemento atual na posição
-		elemento := jogo.Mapa[y][x] // guarda o conteúdo atual da posição
-		if player == 0 {
-			jogo.Mapa[y][x] = jogo.UltimoVisitado1   // restaura o conteúdo anterior
-			jogo.UltimoVisitado1 = jogo.Mapa[ny][nx] // guarda o conteúdo atual da nova posição
-			jogo.Mapa[ny][nx] = elemento
-		} else {
-			jogo.Mapa[y][x] = jogo.UltimoVisitado2   // restaura o conteúdo anterior
-			jogo.UltimoVisitado2 = jogo.Mapa[ny][nx] // guarda o conteúdo atual da nova posição
-			jogo.Mapa[ny][nx] = elemento
+		// Não mover se destino for barreira de água ou fogo
+		if jogo.Mapa[ny][nx].simbolo == Agua.simbolo || jogo.Mapa[ny][nx].simbolo == Fogo.simbolo {
+			continue
 		}
 
+		// Não sobrescrever barreiras nem salvar barreira em UltimoVisitado
+		if jogo.Mapa[y][x].simbolo == Agua.simbolo || jogo.Mapa[y][x].simbolo == Fogo.simbolo {
+			continue
+		}
+
+		elemento := jogo.Mapa[y][x] // guarda o conteúdo atual da posição
+		if player == 0 {
+			// Só salva em UltimoVisitado1 se destino não for barreira
+			if jogo.Mapa[ny][nx].simbolo != Agua.simbolo && jogo.Mapa[ny][nx].simbolo != Fogo.simbolo {
+				jogo.Mapa[y][x] = jogo.UltimoVisitado1   // restaura o conteúdo anterior
+				jogo.UltimoVisitado1 = jogo.Mapa[ny][nx] // guarda o conteúdo atual da nova posição
+				jogo.Mapa[ny][nx] = elemento
+			}
+		} else {
+			if jogo.Mapa[ny][nx].simbolo != Agua.simbolo && jogo.Mapa[ny][nx].simbolo != Fogo.simbolo {
+				jogo.Mapa[y][x] = jogo.UltimoVisitado2   // restaura o conteúdo anterior
+				jogo.UltimoVisitado2 = jogo.Mapa[ny][nx] // guarda o conteúdo atual da nova posição
+				jogo.Mapa[ny][nx] = elemento
+			}
+		}
 	}
 
 }
