@@ -2,7 +2,7 @@
 package main
 
 import (
-	"fmt"
+	"time"
 )
 
 // Atualiza a posição do personagem com base na tecla pressionada (WASD)
@@ -33,10 +33,6 @@ func personagemMover(input InputData, jogo *Jogo, player int) {
 // Define o que ocorre quando o jogador pressiona a tecla de interação
 // Neste exemplo, apenas exibe uma mensagem de status
 // Você pode expandir essa função para incluir lógica de interação com objetos
-func personagemInteragir(jogo *Jogo) {
-	// Atualmente apenas exibe uma mensagem de status
-	jogo.StatusMsg = fmt.Sprintf("Interagindo em (%d, %d)", jogo.Pos1X, jogo.Pos1Y)
-}
 
 var player1Input = make(chan InputData)
 var player2Input = make(chan InputData)
@@ -65,9 +61,6 @@ func personagemExecutarAcao(ev EventoTeclado, jogo *Jogo) bool {
 	case "sair":
 		// Retorna false para indicar que o jogo deve terminar
 		return false
-	case "interagir":
-		// Executa a ação de interação
-		personagemInteragir(jogo)
 	case "mover":
 		// Move o personagem com base na tecla
 		switch ev.Tecla {
@@ -119,6 +112,44 @@ func apagarFogo(jogo *Jogo) {
 	jogo.StatusMsg = "Fogo apagou!"
 }
 
+var player1Vence = make(chan bool, 1)
+var player2Vence = make(chan bool, 1)
+
+func vencerJogo(jogo *Jogo) {
+
+	jogador1chegou := false
+	jogador2chegou := false
+	jogo.StatusMsg = "Voces tem 30 segundos para chegar nas bandeiras juntos "
+	go avisoTempo(jogo)
+	for !jogador1chegou || !jogador2chegou {
+
+		select {
+		case <-player1Vence:
+			jogador1chegou = true
+		case <-player2Vence:
+			jogador2chegou = true
+		case <-time.After(30 * time.Second):
+			jogo.StatusMsg = "Voces Perderam!"
+			resetPersonagens(jogo)
+			vencerJogo(jogo)
+			return // Se timeout, sai sem definir mensagem de vitória
+		}
+	}
+
+	jogo.StatusMsg = "Voces Ganharam!!!!"
+	resetPersonagens(jogo)
+	vencerJogo(jogo)
+}
+func avisoTempo(jogo *Jogo) {
+	time.Sleep(15 * time.Second)
+	jogo.StatusMsg = "Faltam 15 segundos!"
+}
+func resetPersonagens(jogo *Jogo) {
+	jogo.Pos1X, jogo.Pos1Y = jogo.PosCo1X, jogo.PosCo1Y
+	jogo.Pos2X, jogo.Pos2Y = jogo.PosCo2X, jogo.PosCo2Y
+	jogo.UltimoVisitado1 = Vazio
+	jogo.UltimoVisitado2 = Vazio
+}
 func evaporarAgua(jogo *Jogo) {
 	// Salva o elemento atual para restaurar depois
 	elementoAtual := jogo.Mapa[jogo.Pos2Y][jogo.Pos2X]

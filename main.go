@@ -57,7 +57,7 @@ func main() {
 				evaporarAgua(&jogo)
 			}
 			interfaceDesenharJogo(&jogo)
-			time.Sleep(50 * time.Millisecond)
+			time.Sleep(16 * time.Millisecond)
 		}
 	}()
 
@@ -68,11 +68,8 @@ func main() {
 	go inimigoPatrulha(0, &jogo)
 	go inimigoPatrulha(1, &jogo)
 	go ativarBotoes(&jogo)
-	go inimigoRecebeInput(0, &jogo)
-	go inimigoRecebeInput(1, &jogo)
-	go inimigoPatrulha(0, &jogo)
-	go inimigoPatrulha(1, &jogo)
 	go jogoMoverElemento()
+	go vencerJogo(&jogo)
 
 	// Goroutine para monitorar proximidade e alertar inimigos
 	go func() {

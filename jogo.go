@@ -51,6 +51,8 @@ var (
 	Vazio          = Elemento{' ', CorPadrao, CorPadrao, false}
 	Fogo           = Elemento{'^', CorVermelho, CorPadrao, false}
 	Agua           = Elemento{'~', CorAzul, CorPadrao, false}
+	BandeiraFogo   = Elemento{'⚐', CorVermelho, CorPadrao, false}
+	BandeiraAgua   = Elemento{'⚑', CorAzul, CorPadrao, false}
 )
 
 // Cria e retorna uma nova instância do jogo
@@ -100,6 +102,10 @@ func jogoCarregarMapa(nome string, jogo *Jogo) error {
 				e = Fogo
 			case Agua.simbolo:
 				e = Agua
+			case BandeiraFogo.simbolo:
+				e = BandeiraFogo
+			case BandeiraAgua.simbolo:
+				e = BandeiraAgua
 
 			}
 			linhaElems = append(linhaElems, e)
@@ -139,7 +145,17 @@ func jogoPodeMoverPara(jogo *Jogo, x, y int, player ...int) bool {
 		evaporarAgua(jogo)
 		return false
 	}
+	if jogo.Mapa[y][x].simbolo == BandeiraFogo.simbolo && player != nil && player[0] == 0 {
+		jogo.StatusMsg = "O FOGO CHEGOU !"
+		player1Vence <- true
 
+		return true
+	}
+	if jogo.Mapa[y][x].simbolo == BandeiraAgua.simbolo && player != nil && player[0] == 1 {
+		jogo.StatusMsg = "A ÁGUA CHEGOU !"
+		player2Vence <- true
+		return true
+	}
 	// Pode mover para a posição
 	return true
 }
@@ -167,6 +183,12 @@ func jogoMoverElemento() {
 			continue
 		}
 		if jogo.Mapa[y][x].simbolo == Portao.simbolo || jogo.Mapa[ny][nx].simbolo == Portao.simbolo {
+			continue
+		}
+		if jogo.Mapa[y][x].simbolo == BandeiraAgua.simbolo || jogo.Mapa[ny][nx].simbolo == BandeiraAgua.simbolo {
+			continue
+		}
+		if jogo.Mapa[y][x].simbolo == BandeiraFogo.simbolo || jogo.Mapa[ny][nx].simbolo == BandeiraFogo.simbolo {
 			continue
 		}
 		elemento := jogo.Mapa[y][x] // guarda o conteúdo atual da posição

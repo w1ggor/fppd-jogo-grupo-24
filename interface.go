@@ -112,7 +112,7 @@ func interfaceDesenharBarraDeStatus(jogo *Jogo) {
 	}
 
 	// Instruções fixas
-	msg := "Use WASD para mover e E para interagir. ESC para sair."
+	msg := "Use WASD para mover o personagem de FOGO | Use IJKL para mover o personagem de AGUA.| ESC para sair."
 	for i, c := range msg {
 		termbox.SetCell(i, len(jogo.Mapa)+3, c, CorTexto, CorPadrao)
 	}
