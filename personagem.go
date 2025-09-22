@@ -109,7 +109,7 @@ func personagemExecutarAcao(ev EventoTeclado, jogo *Jogo) bool {
 func apagarFogo(jogo *Jogo) {
 	// Salva o elemento atual para restaurar depois
 	elementoAtual := jogo.Mapa[jogo.Pos1Y][jogo.Pos1X]
-	
+
 	// Move o personagem para a posição inicial
 	jogo.Mapa[jogo.Pos1Y][jogo.Pos1X] = jogo.UltimoVisitado1
 	jogo.Pos1X, jogo.Pos1Y = jogo.PosCo1X, jogo.PosCo1Y
@@ -122,7 +122,7 @@ func apagarFogo(jogo *Jogo) {
 func evaporarAgua(jogo *Jogo) {
 	// Salva o elemento atual para restaurar depois
 	elementoAtual := jogo.Mapa[jogo.Pos2Y][jogo.Pos2X]
-	
+
 	// Move o personagem para a posição inicial
 	jogo.Mapa[jogo.Pos2Y][jogo.Pos2X] = jogo.UltimoVisitado2
 	jogo.Pos2X, jogo.Pos2Y = jogo.PosCo2X, jogo.PosCo2Y

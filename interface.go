@@ -6,6 +6,8 @@
 package main
 
 import (
+	"time"
+
 	"github.com/nsf/termbox-go"
 )
 
@@ -76,9 +78,15 @@ func interfaceDesenharJogo(jogo *Jogo) {
 	interfaceDesenharElemento(jogo.IniAguaPosX, jogo.IniAguaPosY, InimigoAgua)
 	// Desenha a barra de status
 	interfaceDesenharBarraDeStatus(jogo)
-
+	// Desenha o portao abrindo
+	interfaceDesenharElemento(jogo.PosPortao1XA, jogo.PosPortao1YA, Vazio)
+	interfaceDesenharElemento(jogo.PosPortao2XA, jogo.PosPortao2YA, Vazio)
+	// Desenha o portao fechando
+	interfaceDesenharElemento(jogo.PosPortao1XF, jogo.PosPortao1YF, Portao)
+	interfaceDesenharElemento(jogo.PosPortao2XF, jogo.PosPortao2YF, Portao)
 	// Força a atualização do terminal
 	interfaceAtualizarTela()
+	time.Sleep(time.Millisecond * 16)
 }
 
 // Limpa a tela do terminal

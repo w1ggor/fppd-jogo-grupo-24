@@ -67,6 +67,11 @@ func main() {
 	go inimigoRecebeInput(1, &jogo)
 	go inimigoPatrulha(0, &jogo)
 	go inimigoPatrulha(1, &jogo)
+	go ativarBotoes(&jogo)
+	go inimigoRecebeInput(0, &jogo)
+	go inimigoRecebeInput(1, &jogo)
+	go inimigoPatrulha(0, &jogo)
+	go inimigoPatrulha(1, &jogo)
 	go jogoMoverElemento()
 
 	// Goroutine para monitorar proximidade e alertar inimigos

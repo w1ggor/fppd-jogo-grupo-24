@@ -4,6 +4,7 @@ package main
 import (
 	"bufio"
 	"os"
+	"time"
 )
 
 // Elemento representa qualquer objeto do mapa (parede, personagem, vegetação, etc)
@@ -28,6 +29,10 @@ type Jogo struct {
 	IniAguaPosX, IniAguaPosY           int          // posição atual do inimigo de fogo
 	UltimoVisitado1                    Elemento     // elemento que estava na posição do personagem antes de mover
 	UltimoVisitado2                    Elemento
+	PosPortao1XF, PosPortao1YF         int
+	PosPortao2XF, PosPortao2YF         int
+	PosPortao1XA, PosPortao1YA         int
+	PosPortao2XA, PosPortao2YA         int
 	StatusMsg                          string // mensagem para a barra de status
 }
 
@@ -40,6 +45,8 @@ var (
 	InimigoFogo    = Elemento{'◇', CorVermelho, CorPadrao, true}
 	InimigoAgua    = Elemento{'◆', CorAzul, CorPadrao, true}
 	Parede         = Elemento{'▤', CorParede, CorFundoParede, true}
+	Portao         = Elemento{'▒', CorPadrao, CorPadrao, true}
+	Botao          = Elemento{'◙', CorPadrao, CorPadrao, false}
 	Vegetacao      = Elemento{'♣', CorVerde, CorPadrao, false}
 	Vazio          = Elemento{' ', CorPadrao, CorPadrao, false}
 	Fogo           = Elemento{'^', CorVermelho, CorPadrao, false}
@@ -77,6 +84,10 @@ func jogoCarregarMapa(nome string, jogo *Jogo) error {
 			case InimigoAgua.simbolo:
 				jogo.IniAguaPosX, jogo.IniAguaPosY = x, y // registra a posição inicial do inimigo de água
 				e = Vazio                                 // remove o símbolo do inimigo do mapa
+			case Portao.simbolo:
+				e = Portao
+			case Botao.simbolo:
+				e = Botao
 			case Vegetacao.simbolo:
 				e = Vegetacao
 			case PersonagemFogo.simbolo:
@@ -89,6 +100,7 @@ func jogoCarregarMapa(nome string, jogo *Jogo) error {
 				e = Fogo
 			case Agua.simbolo:
 				e = Agua
+				jogo.Pos2X, jogo.Pos2Y = x, y // registra a posição inicial do personagem
 			}
 			linhaElems = append(linhaElems, e)
 		}
@@ -167,6 +179,126 @@ func jogoMoverElemento() {
 				jogo.Mapa[ny][nx] = elemento
 			}
 		}
+		// Obtem elemento atual na posição
+
+		switch player {
+		case 0:
+			jogo.Mapa[y][x] = jogo.UltimoVisitado1   // restaura o conteúdo anterior
+			jogo.UltimoVisitado1 = jogo.Mapa[ny][nx] // guarda o conteúdo atual da nova posição
+			jogo.Mapa[ny][nx] = elemento
+		case 1:
+			jogo.Mapa[y][x] = jogo.UltimoVisitado2   // restaura o conteúdo anterior
+			jogo.UltimoVisitado2 = jogo.Mapa[ny][nx] // guarda o conteúdo atual da nova posição
+			jogo.Mapa[ny][nx] = elemento
+		default:
+			jogo.Mapa[y][x] = Vazio                  // restaura o conteúdo anterior
+			jogo.UltimoVisitado2 = jogo.Mapa[ny][nx] // guarda o conteúdo atual da nova posição
+			jogo.Mapa[ny][nx] = elemento
+		}
+
 	}
 
+}
+
+func ativarBotoes(jogo *Jogo) {
+	var canalP1 = make(chan int)
+	var canalP2 = make(chan int)
+	var interromperP1 = make(chan int)
+	var interromperP2 = make(chan int)
+
+	go ativarB1(jogo, canalP2, interromperP2)
+	go ativarB2(jogo, canalP1, interromperP1)
+}
+
+func ativarB1(jogo *Jogo, canalP2 chan int, interromperP2 chan int) {
+	for {
+		if jogo.Pos2X == 13 && jogo.Pos2Y == 12 {
+			go abrirP2(jogo, canalP2)
+			<-canalP2
+			go fecharP2(jogo, interromperP2)
+			<-interromperP2
+		}
+	}
+}
+
+func ativarB2(jogo *Jogo, canalP1 chan int, interromperP1 chan int) {
+	for {
+		if jogo.Pos1X == 66 && jogo.Pos1Y == 24 {
+			go abrirP1(jogo, canalP1)
+			<-canalP1
+			go fecharP1(jogo, interromperP1)
+			<-interromperP1
+		}
+	}
+}
+
+func abrirP1(jogo *Jogo, canalP1 chan int) {
+	px1 := 25
+	py1 := 17
+
+	for {
+		if px1 == 0 {
+			canalP1 <- 1
+			return
+		}
+		jogo.Mapa[py1][px1] = Vazio
+		jogo.PosPortao1XA, jogo.PosPortao1YA = px1, py1
+		time.Sleep(time.Millisecond * 100)
+		px1--
+	}
+}
+
+func abrirP2(jogo *Jogo, canalP2 chan int) {
+	px2 := 78
+	py2 := 17
+
+	for {
+		if px2 == 53 {
+			canalP2 <- 53
+			return
+		}
+		jogo.Mapa[py2][px2] = Vazio
+		jogo.PosPortao2XA, jogo.PosPortao2YA = px2, py2
+		time.Sleep(time.Millisecond * 100)
+		px2--
+	}
+}
+
+func fecharP1(jogo *Jogo, interromperP1 chan int) {
+	px1 := 1
+	py1 := 17
+
+	for {
+		if jogo.Pos1X == 66 && jogo.Pos1Y == 24 {
+			continue
+		}
+		for px1 < 26 {
+			jogo.Mapa[py1][px1] = Portao
+			jogo.PosPortao1XF, jogo.PosPortao1YF = px1, py1
+			time.Sleep(time.Millisecond * 100)
+			px1++
+		}
+		interromperP1 <- 25
+		return
+	}
+
+}
+
+func fecharP2(jogo *Jogo, interromperP2 chan int) {
+	px2 := 54
+	py2 := 17
+
+	for {
+		if jogo.Pos2X == 13 && jogo.Pos2Y == 12 {
+			continue
+		}
+		for px2 < 79 {
+			jogo.Mapa[py2][px2] = Portao
+			jogo.PosPortao2XF, jogo.PosPortao2YF = px2, py2
+			time.Sleep(time.Millisecond * 100)
+			px2++
+		}
+		interromperP2 <- 78
+		return
+	}
 }
