@@ -61,32 +61,32 @@ func interfaceLerEventoTeclado() EventoTeclado {
 
 // Renderiza todo o estado atual do jogo na tela
 func interfaceDesenharJogo(jogo *Jogo) {
-		interfaceLimparTela()
-	
-		// Desenha todos os elementos do mapa
-		for y, linha := range jogo.Mapa {
-			for x, elem := range linha {
-				interfaceDesenharElemento(x, y, elem)
-			}
+	interfaceLimparTela()
+
+	// Desenha todos os elementos do mapa
+	for y, linha := range jogo.Mapa {
+		for x, elem := range linha {
+			interfaceDesenharElemento(x, y, elem)
 		}
-	
-		// Desenha o personagem sobre o mapa
-		interfaceDesenharElemento(jogo.Pos1X, jogo.Pos1Y, PersonagemFogo)
-		interfaceDesenharElemento(jogo.Pos2X, jogo.Pos2Y, PersonagemAgua)
-		// Desenha os inimigos sobre o mapa
+	}
+
+	// Desenha o personagem sobre o mapa
+	interfaceDesenharElemento(jogo.Pos1X, jogo.Pos1Y, PersonagemFogo)
+	interfaceDesenharElemento(jogo.Pos2X, jogo.Pos2Y, PersonagemAgua)
+	// Desenha os inimigos sobre o mapa
 	interfaceDesenharElemento(jogo.IniFogoPosX, jogo.IniFogoPosY, InimigoFogo)
 	interfaceDesenharElemento(jogo.IniAguaPosX, jogo.IniAguaPosY, InimigoAgua)
 	// Desenha a barra de status
-		interfaceDesenharBarraDeStatus(jogo)
-		// Desenha o portao abrindo
-		interfaceDesenharElemento(jogo.PosPortao1XA, jogo.PosPortao1YA, Vazio)
-		interfaceDesenharElemento(jogo.PosPortao2XA, jogo.PosPortao2YA, Vazio)
-		// Desenha o portao fechando
-		interfaceDesenharElemento(jogo.PosPortao1XF, jogo.PosPortao1YF, Portao)
-		interfaceDesenharElemento(jogo.PosPortao2XF, jogo.PosPortao2YF, Portao)
-		// Força a atualização do terminal
-		interfaceAtualizarTela()
-		time.Sleep(time.Millisecond * 16)
+	interfaceDesenharBarraDeStatus(jogo)
+	// Desenha o portao abrindo
+	interfaceDesenharElemento(jogo.PosPortao1XA, jogo.PosPortao1YA, Vazio)
+	interfaceDesenharElemento(jogo.PosPortao2XA, jogo.PosPortao2YA, Vazio)
+	// Desenha o portao fechando
+	interfaceDesenharElemento(jogo.PosPortao1XF, jogo.PosPortao1YF, Portao)
+	interfaceDesenharElemento(jogo.PosPortao2XF, jogo.PosPortao2YF, Portao)
+	// Força a atualização do terminal
+	interfaceAtualizarTela()
+	time.Sleep(time.Millisecond * 16)
 }
 
 // Limpa a tela do terminal

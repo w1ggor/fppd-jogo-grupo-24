@@ -139,12 +139,17 @@ func jogoMoverElemento() {
 
 		// Obtem elemento atual na posição
 		elemento := jogo.Mapa[y][x] // guarda o conteúdo atual da posição
-		if player == 0 {
+		switch player {
+		case 0:
 			jogo.Mapa[y][x] = jogo.UltimoVisitado1   // restaura o conteúdo anterior
 			jogo.UltimoVisitado1 = jogo.Mapa[ny][nx] // guarda o conteúdo atual da nova posição
 			jogo.Mapa[ny][nx] = elemento
-		} else {
+		case 1:
 			jogo.Mapa[y][x] = jogo.UltimoVisitado2   // restaura o conteúdo anterior
+			jogo.UltimoVisitado2 = jogo.Mapa[ny][nx] // guarda o conteúdo atual da nova posição
+			jogo.Mapa[ny][nx] = elemento
+		default:
+			jogo.Mapa[y][x] = Vazio                  // restaura o conteúdo anterior
 			jogo.UltimoVisitado2 = jogo.Mapa[ny][nx] // guarda o conteúdo atual da nova posição
 			jogo.Mapa[ny][nx] = elemento
 		}
@@ -195,8 +200,8 @@ func abrirP1(jogo *Jogo, canalP1 chan int) {
 			return
 		}
 		jogo.Mapa[py1][px1] = Vazio
-		time.Sleep(time.Millisecond * 100)
 		jogo.PosPortao1XA, jogo.PosPortao1YA = px1, py1
+		time.Sleep(time.Millisecond * 100)
 		px1--
 	}
 }
@@ -211,8 +216,8 @@ func abrirP2(jogo *Jogo, canalP2 chan int) {
 			return
 		}
 		jogo.Mapa[py2][px2] = Vazio
-		time.Sleep(time.Millisecond * 100)
 		jogo.PosPortao2XA, jogo.PosPortao2YA = px2, py2
+		time.Sleep(time.Millisecond * 100)
 		px2--
 	}
 }
@@ -227,11 +232,12 @@ func fecharP1(jogo *Jogo, interromperP1 chan int) {
 		}
 		for px1 < 26 {
 			jogo.Mapa[py1][px1] = Portao
-			time.Sleep(time.Millisecond * 100)
 			jogo.PosPortao1XF, jogo.PosPortao1YF = px1, py1
+			time.Sleep(time.Millisecond * 100)
 			px1++
 		}
 		interromperP1 <- 25
+		return
 	}
 
 }
@@ -246,10 +252,11 @@ func fecharP2(jogo *Jogo, interromperP2 chan int) {
 		}
 		for px2 < 79 {
 			jogo.Mapa[py2][px2] = Portao
-			time.Sleep(time.Millisecond * 100)
 			jogo.PosPortao2XF, jogo.PosPortao2YF = px2, py2
+			time.Sleep(time.Millisecond * 100)
 			px2++
 		}
 		interromperP2 <- 78
+		return
 	}
 }
