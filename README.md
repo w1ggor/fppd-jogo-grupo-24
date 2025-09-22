@@ -212,6 +212,7 @@ func jogoMoverElemento() {
 - Sincronização do mapa
 ## Pelo menos um elemento escuta múltiplos canais e isso é demonstrável
 - Verificação das bandeiras para vencer o jogo
+- Inimigo utiliza dois canais para patrulhar e ficar alerta aos personagens
 ## Pelo menos um elemento utiliza canais com timeout de forma testável
 - Timeout que finaliza o jogo e mostra a mensagem
 ## Há controle de exclusão mútua nas regiões críticas do jogo utilizando canais 

@@ -48,7 +48,6 @@ func main() {
 			// Verifica colisão inimigo de água com personagem de fogo
 			if jogo.IniAguaPosX == jogo.Pos1X && jogo.IniAguaPosY == jogo.Pos1Y {
 				// Volta personagem de fogo para posição inicial
-				// Procura posição inicial no mapa
 				apagarFogo(&jogo)
 			}
 			// Verifica colisão inimigo de fogo com personagem de água

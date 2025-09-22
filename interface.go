@@ -112,8 +112,20 @@ func interfaceDesenharBarraDeStatus(jogo *Jogo) {
 	}
 
 	// Instruções fixas
-	msg := "Use WASD para mover o personagem de FOGO | Use IJKL para mover o personagem de AGUA.| ESC para sair."
+	msg := "Use WASD para mover o personagem de FOGO"
 	for i, c := range msg {
-		termbox.SetCell(i, len(jogo.Mapa)+3, c, CorTexto, CorPadrao)
+		termbox.SetCell(i, len(jogo.Mapa)+3, c, CorTexto, CorVermelho)
+	}
+
+	// Instruções fixas
+	msg2 := "Use IJKL para mover o personagem de AGUA."
+	for i, c := range msg2 {
+		termbox.SetCell(i, len(jogo.Mapa)+4, c, CorTexto, CorAzul)
+	}
+
+	// Instruções fixas
+	msg3 := "ESC para sair."
+	for i, c := range msg3 {
+		termbox.SetCell(i, len(jogo.Mapa)+5, c, CorTexto, CorPadrao)
 	}
 }

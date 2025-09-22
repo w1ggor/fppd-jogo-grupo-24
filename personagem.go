@@ -99,19 +99,6 @@ func personagemExecutarAcao(ev EventoTeclado, jogo *Jogo) bool {
 	return true // Continua o jogo
 }
 
-func apagarFogo(jogo *Jogo) {
-	// Salva o elemento atual para restaurar depois
-	elementoAtual := jogo.Mapa[jogo.Pos1Y][jogo.Pos1X]
-
-	// Move o personagem para a posição inicial
-	jogo.Mapa[jogo.Pos1Y][jogo.Pos1X] = jogo.UltimoVisitado1
-	jogo.Pos1X, jogo.Pos1Y = jogo.PosCo1X, jogo.PosCo1Y
-	jogo.UltimoVisitado1 = jogo.Mapa[jogo.Pos1Y][jogo.Pos1X]
-	jogo.Mapa[jogo.Pos1Y][jogo.Pos1X] = elementoAtual
-
-	jogo.StatusMsg = "Fogo apagou!"
-}
-
 var player1Vence = make(chan bool, 1)
 var player2Vence = make(chan bool, 1)
 
@@ -152,6 +139,20 @@ func resetPersonagens(jogo *Jogo) {
 	jogo.UltimoVisitado1 = Vazio
 	jogo.UltimoVisitado2 = Vazio
 }
+
+func apagarFogo(jogo *Jogo) {
+	// Salva o elemento atual para restaurar depois
+	elementoAtual := jogo.Mapa[jogo.Pos1Y][jogo.Pos1X]
+
+	// Move o personagem para a posição inicial
+	jogo.Mapa[jogo.Pos1Y][jogo.Pos1X] = jogo.UltimoVisitado1
+	jogo.Pos1X, jogo.Pos1Y = jogo.PosCo1X, jogo.PosCo1Y
+	jogo.UltimoVisitado1 = jogo.Mapa[jogo.Pos1Y][jogo.Pos1X]
+	jogo.Mapa[jogo.Pos1Y][jogo.Pos1X] = elementoAtual
+
+	jogo.StatusMsg = "Fogo apagou!"
+}
+
 func evaporarAgua(jogo *Jogo) {
 	// Salva o elemento atual para restaurar depois
 	elementoAtual := jogo.Mapa[jogo.Pos2Y][jogo.Pos2X]
