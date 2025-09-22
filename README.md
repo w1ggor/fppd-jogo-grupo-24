@@ -86,12 +86,16 @@ Foram implementados dois inimigos no jogo: o inimigo de fogo (◇) e o inimigo d
 
 Essas alterações demonstram comunicação entre elementos do jogo por canais, escuta concorrente e lógica reativa baseada em eventos do ambiente.
 ### Botões que abrem e fecham portões 
-[TODO]
+Foram implementados dois botões e dois portões interativos em cada um dos lados do mapa. Quando o jogador fica em cima do botão de um lado, o portão do lado oposto irá abrir. Quando ele sai, o portão irá fechar novamente.
+
+O portão fechará apenas após abrir por completo.
+- **Concorrência:** Na main, é chamado um método que inicia ambos os botões como goroutines que ficam esperando até que um jogador fique em cima de um deles. Quando precionado, irá ativar, de maneira concorrente, outra goroutine, que é encarregada por abrir o portão, e logo em seguida uma terceira, com a função de fechar o portão.
+- **Canais:** Também são utilizados quatro canais, sendo cada um para controlar a abertura e fechamento de cada portão. O método principal de cada botão ficará esperando até que a goroutine de abrir o portão envie uma mensagem pelo canal indicando que o portão abriu. Somente então ele poderá iniciar o fechamento. Da mesma forma, a próxima abertura espera o portão fechar por completo.
 ### Bandeiras que finalizam o jogo
 [TODO]
 ### Modificamos o sistema de atualização da interface
 ### Agua e lava
-
+[TODO]
 ### Foi adicionado um canal para sincronizar a mudança do mapa
 Fizemos a sincronização da atualização do mapa via um canal com buffer de tamanho 1, garantindo assim que apenas um elemento pode atualizar o mapa por vez.
 

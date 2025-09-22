@@ -130,6 +130,7 @@ func vencerJogo(jogo *Jogo) {
 			jogador2chegou = true
 		case <-time.After(30 * time.Second):
 			jogo.StatusMsg = "Voces Perderam!"
+			time.Sleep(time.Second * 2)
 			resetPersonagens(jogo)
 			vencerJogo(jogo)
 			return // Se timeout, sai sem definir mensagem de vitória
@@ -137,6 +138,7 @@ func vencerJogo(jogo *Jogo) {
 	}
 
 	jogo.StatusMsg = "Voces Ganharam!!!!"
+	time.Sleep(time.Second * 2)
 	resetPersonagens(jogo)
 	vencerJogo(jogo)
 }
