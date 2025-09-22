@@ -5,11 +5,11 @@ Este projeto é um pequeno jogo desenvolvido em Go que roda no terminal usando a
 ## Como funciona
 
 - O mapa é carregado de um arquivo `.txt` contendo caracteres que representam diferentes elementos do jogo.
-- O personagem se move com as teclas **W**, **A**, **S**, **D**.
-- Pressione **E** para interagir com o ambiente.
+- O personagem de fogo se move com as teclas **W**, **A**, **S**, **D**.
+- O personagem de água se move com as teclas **I**, **J**, **K**, **L**.
 - Pressione **ESC** para sair do jogo.
 
-### Controles
+### Controles Jogador 1
 
 | Tecla | Ação              |
 |-------|-------------------|
@@ -17,7 +17,16 @@ Este projeto é um pequeno jogo desenvolvido em Go que roda no terminal usando a
 | A     | Mover para esquerda |
 | S     | Mover para baixo  |
 | D     | Mover para direita |
-| E     | Interagir         |
+| ESC   | Sair do jogo      |
+
+### Controles Jogador 2
+
+| Tecla | Ação              |
+|-------|-------------------|
+| I     | Mover para cima   |
+| J     | Mover para esquerda |
+| K     | Mover para baixo  |
+| L     | Mover para direita |
 | ESC   | Sair do jogo      |
 
 ## Como compilar
@@ -61,10 +70,11 @@ Também é possivel compilar o projeto usando o comando `make` no Linux ou o scr
 - interface.go — Entrada, saída e renderização com termbox
 - jogo.go — Estruturas e lógica do estado do jogo
 - personagem.go — Ações do jogador
+- inimigo.go - ações dos inimigos
 
 
-## Alterações feitas durante o trabalho
-
+# Alterações feitas durante o trabalho
+### Controle de dois jogadores
 ### Adição de inimigos com patrulha automática e canais concorrentes
 
 Foram implementados dois inimigos no jogo: o inimigo de fogo (◇) e o inimigo de água (◆). Cada inimigo se move automaticamente pelo mapa, patrulhando de um lado para o outro.
@@ -75,6 +85,12 @@ Foram implementados dois inimigos no jogo: o inimigo de fogo (◇) e o inimigo d
 - **Sincronização:** Toda movimentação dos inimigos também é feita via canal, garantindo concorrência segura.
 
 Essas alterações demonstram comunicação entre elementos do jogo por canais, escuta concorrente e lógica reativa baseada em eventos do ambiente.
+### Botões que abrem e fecham portões 
+[TODO]
+### Bandeiras que finalizam o jogo
+[TODO]
+### Modificamos o sistema de atualização da interface
+### Agua e lava
 
 ### Foi adicionado um canal para sincronizar a mudança do mapa
 Fizemos a sincronização da atualização do mapa via um canal com buffer de tamanho 1, garantindo assim que apenas um elemento pode atualizar o mapa por vez.
@@ -120,3 +136,23 @@ func jogoMoverElemento() {
 }
 ```
 </details>
+
+# Requisitos do trabalho
+
+## Foram implementados ao menos 3 tipos de elementos concorrentes autônomos com comportamentos visíveis e distintos no mapa
+- Dois jogadores
+- Botões e portões
+- Inimigos
+- Bandeiras
+- Água e Lava
+
+## Há uso de canais para comunicação e sincronização entre elementos 
+- Sistema de inputs
+- Sincronização do mapa
+## Pelo menos um elemento escuta múltiplos canais e isso é demonstrável
+- Verificação das bandeiras para vencer o jogo
+## Pelo menos um elemento utiliza canais com timeout de forma testável
+- Timeout que finaliza o jogo e mostra a mensagem
+## Há controle de exclusão mútua nas regiões críticas do jogo utilizando canais 
+- Sincronização do mapa
+- Controle dos portões
