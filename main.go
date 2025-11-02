@@ -33,12 +33,12 @@ func main() {
 	mapaFile := "mapa.txt"
 
 	// conecta no servidor
-	if len(os.Args) != 1 {
+	if len(os.Args) != 2 {
 		fmt.Print("É necessário informar um ipv4")
 		return
 	}
 	porta := 8973
-	addr := os.Args[0]
+	addr := os.Args[1]
 	fmt.Printf("Conectando ao servidor em %s na porta %d\n", addr, porta)
 	client, err := rpc.Dial("tcp", fmt.Sprintf("%s:%d", addr, porta))
 	if err != nil {
