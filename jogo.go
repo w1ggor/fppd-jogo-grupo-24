@@ -35,6 +35,7 @@ type Jogo struct {
 	PosPortao1XA, PosPortao1YA         int
 	PosPortao2XA, PosPortao2YA         int
 	StatusMsg                          string
+	LogMsg                             string
 }
 
 func (jogo *Jogo) proximoSequenceNumber() int {

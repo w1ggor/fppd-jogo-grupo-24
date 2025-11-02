@@ -40,7 +40,6 @@ func ChamarRPC(client *rpc.Client, method string, args interface{}, reply interf
 		if err == nil {
 			return nil
 		}
-		fmt.Printf("Erro na chamada RPC '%s' (tentativa %d/%d): %v\n", method, tentativa+1, maxRetries, err)
 		time.Sleep(time.Duration(tentativa+1) * 100 * time.Millisecond)
 	}
 	return fmt.Errorf("falha após %d tentativas: %w", maxRetries, err)
@@ -48,10 +47,7 @@ func ChamarRPC(client *rpc.Client, method string, args interface{}, reply interf
 
 func disconnect(client *rpc.Client, clientId int) {
 	var sucesso bool
-	err := ChamarRPC(client, "DadosJogo.Disconnect", clientId, &sucesso, 3)
-	if err != nil {
-		fmt.Println("Erro ao desconectar do servidor:", err)
-	}
+	ChamarRPC(client, "DadosJogo.Disconnect", clientId, &sucesso, 3)
 }
 
 func main() {
@@ -113,7 +109,7 @@ func main() {
 			var posicoes Posicoes
 			err := ChamarRPC(client, "DadosJogo.GetPosicoes", numeroJogador, &posicoes, 3)
 			if err != nil {
-				fmt.Println("Erro ao obter posições dos jogadores:", err)
+				jogo.LogMsg = "Erro ao obter posições dos jogadores:" + err.Error()
 				continue
 			}
 			if numeroJogador == 1 {
@@ -121,7 +117,7 @@ func main() {
 				jogo.Pos2Y = posicoes.Pos2Y
 				if jogo.Mapa[jogo.Pos2Y][jogo.Pos2X].simbolo == BandeiraAgua.simbolo {
 					if jogo.JogadorAtual == 1 {
-						jogo.StatusMsg = "JOGADOR 2 (ÁGUA) VENCEU!"
+						jogo.StatusMsg = "VOCES VENCERAM!!!!"
 						player2Vence <- true
 					}
 				}
@@ -130,7 +126,7 @@ func main() {
 				jogo.Pos1Y = posicoes.Pos1Y
 				if jogo.Mapa[jogo.Pos1Y][jogo.Pos1X].simbolo == BandeiraFogo.simbolo {
 					if jogo.JogadorAtual == 2 {
-						jogo.StatusMsg = "JOGADOR 1 (FOGO) VENCEU!"
+						jogo.StatusMsg = "VOCES VENCERAM!!!!"
 						player1Vence <- true
 					}
 				}

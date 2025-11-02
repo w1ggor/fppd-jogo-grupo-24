@@ -17,6 +17,7 @@ const (
 	CorParede          = termbox.ColorBlack | termbox.AttrBold | termbox.AttrDim
 	CorFundoParede     = termbox.ColorDarkGray
 	CorTexto           = termbox.ColorDarkGray
+	CorTextoBranco     = termbox.ColorWhite
 )
 
 type EventoTeclado struct {
@@ -87,18 +88,29 @@ func interfaceDesenharBarraDeStatus(jogo *Jogo) {
 		termbox.SetCell(i, len(jogo.Mapa)+1, c, CorTexto, CorPadrao)
 	}
 
-	msg := "Use WASD para mover o personagem de FOGO"
-	for i, c := range msg {
-		termbox.SetCell(i, len(jogo.Mapa)+3, c, CorTexto, CorVermelho)
+	msg := "Use WASD para mover o personagem"
+	cor := CorPadrao
+
+	switch jogo.JogadorAtual {
+	case 1:
+		msg = "Use WASD para mover o personagem FOGO"
+		cor = CorVermelho
+
+	case 2:
+		msg = "Use WASD para mover o personagem AGUA"
+		cor = CorAzul
 	}
 
-	msg2 := "Use IJKL para mover o personagem de AGUA."
-	for i, c := range msg2 {
-		termbox.SetCell(i, len(jogo.Mapa)+4, c, CorTexto, CorAzul)
+	for i, c := range msg {
+		termbox.SetCell(i, len(jogo.Mapa)+3, c, CorTexto, cor)
 	}
 
 	msg3 := "ESC para sair."
 	for i, c := range msg3 {
 		termbox.SetCell(i, len(jogo.Mapa)+5, c, CorTexto, CorPadrao)
+	}
+
+	for i, c := range jogo.LogMsg {
+		termbox.SetCell(i, len(jogo.Mapa)+7, c, CorTextoBranco, CorCinzaEscuro)
 	}
 }
