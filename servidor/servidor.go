@@ -1,4 +1,4 @@
-package main
+package servidor
 
 import (
 	"fmt"
@@ -46,13 +46,34 @@ func (s *DadosJogo) ConectarJogador(_ bool, numeroJogador *int) error {
 	return nil
 }
 
-func (s *DadosJogo) GetPosicoes(args struct{}, resposta *Posicoes) error {
+func (s *DadosJogo) GetPosicoes(player int, resposta *Posicoes) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	*resposta = s.posicaoJogadores
+	fmt.Println("Jogador", player, "solicitou posições dos jogadores")
 	return nil
 }
 
+type MoverElementoType struct {
+	player int
+	x, y   int
+}
+
+func (s *DadosJogo) MoverElemento(dados MoverElementoType, sucesso *bool) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if dados.player == 1 {
+		s.posicaoJogadores.Pos1X = dados.x
+		s.posicaoJogadores.Pos1Y = dados.y
+		fmt.Println("Movimentação do Jogador 1 para:", dados.x, dados.y)
+	} else if dados.player == 2 {
+		s.posicaoJogadores.Pos2X = dados.x
+		s.posicaoJogadores.Pos2Y = dados.y
+		fmt.Println("Movimentação do Jogador 2 para:", dados.x, dados.y)
+	}
+	*sucesso = true
+	return nil
+}
 func main() {
 	porta := 8973
 	servidor := new(DadosJogo)

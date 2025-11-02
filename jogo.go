@@ -3,6 +3,7 @@ package main
 
 import (
 	"bufio"
+	"net/rpc"
 	"os"
 	"time"
 )
@@ -22,6 +23,7 @@ type MoverElementoType struct {
 
 // Jogo contém o estado atual do jogo
 type Jogo struct {
+	cliente                            *rpc.Client  // cliente RPC para comunicação com o servidor
 	JogadorAtual                       int          // número do jogador atual (1 ou 2)
 	Mapa                               [][]Elemento // grade 2D representando o mapa
 	PosCo1X, PosCo1Y, PosCo2X, PosCo2Y int          // posição do comeco do personagem
@@ -57,10 +59,10 @@ var (
 )
 
 // Cria e retorna uma nova instância do jogo
-func jogoNovo(numeroJogador int) Jogo {
+func jogoNovo(numeroJogador int, cliente *rpc.Client) Jogo {
 	// O ultimo elemento visitado é inicializado como vazio
 	// pois o jogo começa com o personagem em uma posição vazia
-	return Jogo{JogadorAtual: numeroJogador, UltimoVisitado1: Vazio, UltimoVisitado2: Vazio}
+	return Jogo{JogadorAtual: numeroJogador, cliente: cliente, UltimoVisitado1: Vazio, UltimoVisitado2: Vazio}
 }
 
 // Lê um arquivo texto linha por linha e constrói o mapa do jogo

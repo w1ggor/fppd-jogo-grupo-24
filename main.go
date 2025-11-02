@@ -4,6 +4,7 @@ package main
 
 import (
 	"fmt"
+	"jogo/servidor"
 	"net/rpc"
 	"os"
 	"time"
@@ -60,7 +61,7 @@ func main() {
 	fmt.Printf("Conectado como Jogador %d\n", numeroJogador)
 
 	// Inicializa o jogo
-	jogo := jogoNovo(numeroJogador)
+	jogo := jogoNovo(numeroJogador, client)
 	if err := jogoCarregarMapa(mapaFile, &jogo); err != nil {
 		panic(err)
 	}
@@ -82,6 +83,27 @@ func main() {
 				evaporarAgua(&jogo)
 			}
 			interfaceDesenharJogo(&jogo)
+			time.Sleep(16 * time.Millisecond)
+		}
+	}()
+
+	go func() {
+		for {
+			// Solicita posições atualizadas dos jogadores ao servidor
+			var posicoes servidor.Posicoes
+			err := client.Call("DadosJogo.GetPosicoes", numeroJogador, &posicoes)
+			if err != nil {
+				fmt.Println("Erro ao obter posições dos jogadores:", err)
+				continue
+			}
+			if numeroJogador == 1 {
+				jogo.Pos2X = posicoes.Pos2X
+				jogo.Pos2Y = posicoes.Pos2Y
+			} else if numeroJogador == 2 {
+				jogo.Pos1X = posicoes.Pos1X
+				jogo.Pos1Y = posicoes.Pos1Y
+			}
+
 			time.Sleep(16 * time.Millisecond)
 		}
 	}()

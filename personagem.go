@@ -17,6 +17,9 @@ func personagemMover(input InputData, jogo *Jogo, player int) {
 			var moveInput = MoverElementoType{player: 0, jogo: jogo, x: jogo.Pos1X, y: jogo.Pos1Y, dx: dx, dy: dy}
 			moveElemento <- moveInput
 			jogo.Pos1X, jogo.Pos1Y = nx, ny
+
+			var sucesso bool
+			jogo.cliente.Call("DadosJogo.MoverElemento", 1, sucesso)
 		}
 	} else {
 		nx, ny := jogo.Pos2X+dx, jogo.Pos2Y+dy
@@ -25,6 +28,9 @@ func personagemMover(input InputData, jogo *Jogo, player int) {
 			var moveInput = MoverElementoType{player: 1, jogo: jogo, x: jogo.Pos2X, y: jogo.Pos2Y, dx: dx, dy: dy}
 			moveElemento <- moveInput
 			jogo.Pos2X, jogo.Pos2Y = nx, ny
+
+			var sucesso bool
+			jogo.cliente.Call("DadosJogo.MoverElemento", 2, sucesso)
 		}
 	}
 
