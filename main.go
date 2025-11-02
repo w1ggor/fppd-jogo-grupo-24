@@ -4,7 +4,6 @@ package main
 
 import (
 	"fmt"
-	"jogo/servidor"
 	"net/rpc"
 	"os"
 	"time"
@@ -22,6 +21,16 @@ type InputData struct {
 	player int
 	input  EventoTeclado
 	dx, dy int
+}
+
+// Structs para RPC com o servidor
+type Posicoes struct {
+	Pos1X, Pos1Y, Pos2X, Pos2Y int
+}
+
+type MoverElementoTypeRPC struct {
+	Player int
+	X, Y   int
 }
 
 func main() {
@@ -90,8 +99,8 @@ func main() {
 	go func() {
 		for {
 			// Solicita posições atualizadas dos jogadores ao servidor
-			var posicoes servidor.Posicoes
-			err := client.Call("DadosJogo.GetPosicoes", numeroJogador, &posicoes)
+			var posicoes Posicoes
+			err := client.Call("DadosJogo.GetPosicoes", jogo.JogadorAtual, &posicoes)
 			if err != nil {
 				fmt.Println("Erro ao obter posições dos jogadores:", err)
 				continue

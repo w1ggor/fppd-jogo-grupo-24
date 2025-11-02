@@ -1,4 +1,4 @@
-package servidor
+package main
 
 import (
 	"fmt"
@@ -16,14 +16,14 @@ type Posicoes struct {
 	Pos1X, Pos1Y, Pos2X, Pos2Y int
 }
 type Inicializar struct {
-	pos1X, pos1Y, pos2X, pos2Y int
+	Pos1X, Pos1Y, Pos2X, Pos2Y int
 }
 
 func (s *DadosJogo) Inicializar(dados Inicializar, sucesso *bool) error {
-	s.posicaoJogadores.Pos1X = dados.pos1X
-	s.posicaoJogadores.Pos1Y = dados.pos1Y
-	s.posicaoJogadores.Pos2X = dados.pos2X
-	s.posicaoJogadores.Pos2Y = dados.pos2Y
+	s.posicaoJogadores.Pos1X = dados.Pos1X
+	s.posicaoJogadores.Pos1Y = dados.Pos1Y
+	s.posicaoJogadores.Pos2X = dados.Pos2X
+	s.posicaoJogadores.Pos2Y = dados.Pos2Y
 	*sucesso = true
 	return nil
 }
@@ -55,25 +55,26 @@ func (s *DadosJogo) GetPosicoes(player int, resposta *Posicoes) error {
 }
 
 type MoverElementoType struct {
-	player int
-	x, y   int
+	Player int
+	X, Y   int
 }
 
-func (s *DadosJogo) MoverElemento(dados MoverElementoType, sucesso *bool) error {
+func (s *DadosJogo) MoverJogador(dados MoverElementoType, sucesso *bool) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	if dados.player == 1 {
-		s.posicaoJogadores.Pos1X = dados.x
-		s.posicaoJogadores.Pos1Y = dados.y
-		fmt.Println("Movimentação do Jogador 1 para:", dados.x, dados.y)
-	} else if dados.player == 2 {
-		s.posicaoJogadores.Pos2X = dados.x
-		s.posicaoJogadores.Pos2Y = dados.y
-		fmt.Println("Movimentação do Jogador 2 para:", dados.x, dados.y)
+	if dados.Player == 1 {
+		s.posicaoJogadores.Pos1X = dados.X
+		s.posicaoJogadores.Pos1Y = dados.Y
+		fmt.Println("Movimentação do Jogador 1 para:", dados.X, dados.Y)
+	} else if dados.Player == 2 {
+		s.posicaoJogadores.Pos2X = dados.X
+		s.posicaoJogadores.Pos2Y = dados.Y
+		fmt.Println("Movimentação do Jogador 2 para:", dados.X, dados.Y)
 	}
 	*sucesso = true
 	return nil
 }
+
 func main() {
 	porta := 8973
 	servidor := new(DadosJogo)

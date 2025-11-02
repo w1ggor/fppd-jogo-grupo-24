@@ -19,7 +19,8 @@ func personagemMover(input InputData, jogo *Jogo, player int) {
 			jogo.Pos1X, jogo.Pos1Y = nx, ny
 
 			var sucesso bool
-			jogo.cliente.Call("DadosJogo.MoverElemento", 1, sucesso)
+			arg := MoverElementoTypeRPC{Player: 1, X: jogo.Pos1X, Y: jogo.Pos1Y}
+			jogo.cliente.Call("DadosJogo.MoverJogador", arg, &sucesso)
 		}
 	} else {
 		nx, ny := jogo.Pos2X+dx, jogo.Pos2Y+dy
@@ -30,7 +31,8 @@ func personagemMover(input InputData, jogo *Jogo, player int) {
 			jogo.Pos2X, jogo.Pos2Y = nx, ny
 
 			var sucesso bool
-			jogo.cliente.Call("DadosJogo.MoverElemento", 2, sucesso)
+			arg := MoverElementoTypeRPC{Player: 2, X: jogo.Pos2X, Y: jogo.Pos2Y}
+			jogo.cliente.Call("DadosJogo.MoverJogador", arg, &sucesso)
 		}
 	}
 
