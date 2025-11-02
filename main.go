@@ -60,7 +60,7 @@ func main() {
 	fmt.Printf("Conectado como Jogador %d\n", numeroJogador)
 
 	// Inicializa o jogo
-	jogo := jogoNovo()
+	jogo := jogoNovo(numeroJogador)
 	if err := jogoCarregarMapa(mapaFile, &jogo); err != nil {
 		panic(err)
 	}

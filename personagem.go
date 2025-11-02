@@ -65,32 +65,19 @@ func personagemExecutarAcao(ev EventoTeclado, jogo *Jogo) bool {
 		// Move o personagem com base na tecla
 		switch ev.Tecla {
 		case 'w':
-			input.player = 0
 			input.dy = -1 // Move para cima
 		case 'a':
-			input.player = 0
+
 			input.dx = -1 // Move para a esquerda
 		case 's':
-			input.player = 0
+
 			input.dy = 1 // Move para baixo
 		case 'd':
-			input.player = 0
-			input.dx = 1 // Move para a direita
-		case 'i':
-			input.player = 1
-			input.dy = -1 // Move para cima
-		case 'j':
-			input.player = 1
-			input.dx = -1 // Move para a esquerda
-		case 'k':
-			input.player = 1
-			input.dy = 1 // Move para baixo
-		case 'l':
-			input.player = 1
-			input.dx = 1
-		}
 
-		if input.player == 0 {
+			input.dx = 1 // Move para a direita
+		}
+		input.player = jogo.JogadorAtual
+		if input.player == 1 {
 			player1Input <- input
 		} else {
 			player2Input <- input
