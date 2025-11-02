@@ -116,9 +116,11 @@ func jogoCarregarMapa(nome string, jogo *Jogo) error {
 		jogo.Mapa = append(jogo.Mapa, linhaElems)
 		y++
 	}
-	if err := scanner.Err(); err != nil {
+
+	if err = scanner.Err(); err != nil {
 		return err
 	}
+
 	return nil
 }
 
@@ -173,6 +175,11 @@ func jogoMoverElemento() {
 		var player, x, y, dx, dy = moveInput.player, moveInput.x, moveInput.y, moveInput.dx, moveInput.dy
 		nx, ny := x+dx, y+dy
 
+		// Verificações de limites
+		if ny < 0 || ny >= len(jogo.Mapa) || nx < 0 || nx >= len(jogo.Mapa[ny]) {
+			continue
+		}
+
 		// Não mover se destino for barreira de água ou fogo
 		if jogo.Mapa[ny][nx].simbolo == Agua.simbolo || jogo.Mapa[ny][nx].simbolo == Fogo.simbolo {
 			continue
@@ -194,38 +201,22 @@ func jogoMoverElemento() {
 		if jogo.Mapa[y][x].simbolo == BandeiraFogo.simbolo || jogo.Mapa[ny][nx].simbolo == BandeiraFogo.simbolo {
 			continue
 		}
-		elemento := jogo.Mapa[y][x] // guarda o conteúdo atual da posição
-		if player == 0 {
-			// Só salva em UltimoVisitado1 se destino não for barreira
-			if jogo.Mapa[ny][nx].simbolo != Agua.simbolo && jogo.Mapa[ny][nx].simbolo != Fogo.simbolo {
-				jogo.Mapa[y][x] = jogo.UltimoVisitado1   // restaura o conteúdo anterior
-				jogo.UltimoVisitado1 = jogo.Mapa[ny][nx] // guarda o conteúdo atual da nova posição
-				jogo.Mapa[ny][nx] = elemento
-			}
-		} else {
-			if jogo.Mapa[ny][nx].simbolo != Agua.simbolo && jogo.Mapa[ny][nx].simbolo != Fogo.simbolo {
-				jogo.Mapa[y][x] = jogo.UltimoVisitado2   // restaura o conteúdo anterior
-				jogo.UltimoVisitado2 = jogo.Mapa[ny][nx] // guarda o conteúdo atual da nova posição
-				jogo.Mapa[ny][nx] = elemento
-			}
-		}
-		// Obtem elemento atual na posição
 
-		switch player {
-		case 0:
+		elemento := jogo.Mapa[y][x] // guarda o conteúdo atual da posição
+
+		if player == 0 {
 			jogo.Mapa[y][x] = jogo.UltimoVisitado1   // restaura o conteúdo anterior
 			jogo.UltimoVisitado1 = jogo.Mapa[ny][nx] // guarda o conteúdo atual da nova posição
 			jogo.Mapa[ny][nx] = elemento
-		case 1:
+		} else if player == 1 {
 			jogo.Mapa[y][x] = jogo.UltimoVisitado2   // restaura o conteúdo anterior
 			jogo.UltimoVisitado2 = jogo.Mapa[ny][nx] // guarda o conteúdo atual da nova posição
 			jogo.Mapa[ny][nx] = elemento
-		default:
-			jogo.Mapa[y][x] = Vazio                  // restaura o conteúdo anterior
-			jogo.UltimoVisitado2 = jogo.Mapa[ny][nx] // guarda o conteúdo atual da nova posição
+		} else {
+			// Inimigos ou outros elementos
+			jogo.Mapa[y][x] = Vazio
 			jogo.Mapa[ny][nx] = elemento
 		}
-
 	}
 
 }

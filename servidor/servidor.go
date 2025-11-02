@@ -19,7 +19,7 @@ type Inicializar struct {
 	Pos1X, Pos1Y, Pos2X, Pos2Y int
 }
 
-func (s *DadosJogo) Inicializar(dados Inicializar, sucesso *bool) error {
+func (s *DadosJogo) Inicializar(dados Posicoes, sucesso *bool) error {
 	s.posicaoJogadores.Pos1X = dados.Pos1X
 	s.posicaoJogadores.Pos1Y = dados.Pos1Y
 	s.posicaoJogadores.Pos2X = dados.Pos2X
