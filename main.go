@@ -3,6 +3,8 @@
 package main
 
 import (
+	"fmt"
+	"net/rpc"
 	"os"
 	"time"
 )
@@ -29,9 +31,33 @@ func main() {
 
 	// Usa "mapa.txt" como arquivo padrão ou lê o primeiro argumento
 	mapaFile := "mapa.txt"
-	if len(os.Args) > 1 {
-		mapaFile = os.Args[1]
+
+	// conecta no servidor
+	if len(os.Args) != 1 {
+		fmt.Print("É necessário informar um ipv4")
+		return
 	}
+	porta := 8973
+	addr := os.Args[0]
+	fmt.Printf("Conectando ao servidor em %s na porta %d\n", addr, porta)
+	client, err := rpc.Dial("tcp", fmt.Sprintf("%s:%d", addr, porta))
+	if err != nil {
+		fmt.Println("Erro ao conectar ao servidor:", err)
+		return
+	}
+	defer client.Close()
+	// solicita o número do jogador
+	var numeroJogador int
+	err = client.Call("DadosJogo.ConectarJogador", true, &numeroJogador)
+	if err != nil {
+		fmt.Println("Erro ao conectar como jogador:", err)
+		return
+	}
+	if numeroJogador == -1 {
+		fmt.Println("Servidor cheio. Não foi possível conectar como jogador.")
+		return
+	}
+	fmt.Printf("Conectado como Jogador %d\n", numeroJogador)
 
 	// Inicializa o jogo
 	jogo := jogoNovo()

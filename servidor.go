@@ -33,11 +33,11 @@ func (s *DadosJogo) ConectarJogador(_ bool, numeroJogador *int) error {
 	defer s.mu.Unlock()
 	if !s.player1 {
 		s.player1 = true
-		*numeroJogador = 0
+		*numeroJogador = 1
 		fmt.Println("Jogador 1 conectado")
 	} else if !s.player2 {
 		s.player2 = true
-		*numeroJogador = 1
+		*numeroJogador = 2
 		fmt.Println("Jogador 2 conectado")
 	} else {
 		*numeroJogador = -1
