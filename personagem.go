@@ -19,8 +19,18 @@ func personagemMover(input InputData, jogo *Jogo, player int) {
 			jogo.Pos1X, jogo.Pos1Y = nx, ny
 
 			var sucesso bool
-			arg := MoverElementoTypeRPC{Player: 1, X: jogo.Pos1X, Y: jogo.Pos1Y}
-			jogo.cliente.Call("DadosJogo.MoverJogador", arg, &sucesso)
+			arg := MoverElementoTypeRPC{
+				Player:         1,
+				X:              jogo.Pos1X,
+				Y:              jogo.Pos1Y,
+				ClientID:       jogo.JogadorAtual,
+				SequenceNumber: jogo.proximoSequenceNumber(),
+			}
+			err := callRPCWithRetry(jogo.cliente, "DadosJogo.MoverJogador", arg, &sucesso, 3)
+			if err != nil {
+				// Log do erro, mas não bloqueia o jogo
+				// O servidor pode estar temporariamente indisponível
+			}
 		}
 	} else {
 		nx, ny := jogo.Pos2X+dx, jogo.Pos2Y+dy
@@ -31,8 +41,17 @@ func personagemMover(input InputData, jogo *Jogo, player int) {
 			jogo.Pos2X, jogo.Pos2Y = nx, ny
 
 			var sucesso bool
-			arg := MoverElementoTypeRPC{Player: 2, X: jogo.Pos2X, Y: jogo.Pos2Y}
-			jogo.cliente.Call("DadosJogo.MoverJogador", arg, &sucesso)
+			arg := MoverElementoTypeRPC{
+				Player:         2,
+				X:              jogo.Pos2X,
+				Y:              jogo.Pos2Y,
+				ClientID:       jogo.JogadorAtual,
+				SequenceNumber: jogo.proximoSequenceNumber(),
+			}
+			err := callRPCWithRetry(jogo.cliente, "DadosJogo.MoverJogador", arg, &sucesso, 3)
+			if err != nil {
+				// Log do erro, mas não bloqueia o jogo
+			}
 		}
 	}
 

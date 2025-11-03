@@ -26,11 +26,29 @@ type InputData struct {
 // Structs para RPC com o servidor
 type Posicoes struct {
 	Pos1X, Pos1Y, Pos2X, Pos2Y int
+	ClientID                   int
+	SequenceNumber             int
 }
 
 type MoverElementoTypeRPC struct {
-	Player int
-	X, Y   int
+	Player         int
+	X, Y           int
+	ClientID       int
+	SequenceNumber int
+}
+
+// Função para chamadas RPC com retry automático
+func callRPCWithRetry(client *rpc.Client, method string, args interface{}, reply interface{}, maxRetries int) error {
+	var err error
+	for tentativa := 0; tentativa < maxRetries; tentativa++ {
+		err = client.Call(method, args, reply)
+		if err == nil {
+			return nil
+		}
+		fmt.Printf("Erro na chamada RPC '%s' (tentativa %d/%d): %v\n", method, tentativa+1, maxRetries, err)
+		time.Sleep(time.Duration(tentativa+1) * 100 * time.Millisecond) // Backoff exponencial
+	}
+	return fmt.Errorf("falha após %d tentativas: %w", maxRetries, err)
 }
 
 func main() {
@@ -58,7 +76,7 @@ func main() {
 	defer client.Close()
 	// solicita o número do jogador
 	var numeroJogador int
-	err = client.Call("DadosJogo.ConectarJogador", true, &numeroJogador)
+	err = callRPCWithRetry(client, "DadosJogo.ConectarJogador", true, &numeroJogador, 5)
 	if err != nil {
 		fmt.Println("Erro ao conectar como jogador:", err)
 		return
@@ -100,7 +118,7 @@ func main() {
 		for {
 			// Solicita posições atualizadas dos jogadores ao servidor
 			var posicoes Posicoes
-			err := client.Call("DadosJogo.GetPosicoes", jogo.JogadorAtual, &posicoes)
+			err := callRPCWithRetry(client, "DadosJogo.GetPosicoes", numeroJogador, &posicoes, 3)
 			if err != nil {
 				fmt.Println("Erro ao obter posições dos jogadores:", err)
 				continue

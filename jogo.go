@@ -25,6 +25,7 @@ type MoverElementoType struct {
 type Jogo struct {
 	cliente                            *rpc.Client  // cliente RPC para comunicação com o servidor
 	JogadorAtual                       int          // número do jogador atual (1 ou 2)
+	sequenceNumber                     int          // contador de sequência para comandos RPC
 	Mapa                               [][]Elemento // grade 2D representando o mapa
 	PosCo1X, PosCo1Y, PosCo2X, PosCo2Y int          // posição do comeco do personagem
 	Pos1X, Pos1Y, Pos2X, Pos2Y         int          // posição atual do personagem
@@ -37,6 +38,12 @@ type Jogo struct {
 	PosPortao1XA, PosPortao1YA         int
 	PosPortao2XA, PosPortao2YA         int
 	StatusMsg                          string // mensagem para a barra de status
+}
+
+// Gera o próximo número de sequência
+func (jogo *Jogo) proximoSequenceNumber() int {
+	jogo.sequenceNumber++
+	return jogo.sequenceNumber
 }
 
 // Elementos visuais do jogo
@@ -62,7 +69,13 @@ var (
 func jogoNovo(numeroJogador int, cliente *rpc.Client) Jogo {
 	// O ultimo elemento visitado é inicializado como vazio
 	// pois o jogo começa com o personagem em uma posição vazia
-	return Jogo{JogadorAtual: numeroJogador, cliente: cliente, UltimoVisitado1: Vazio, UltimoVisitado2: Vazio}
+	return Jogo{
+		JogadorAtual:   numeroJogador,
+		cliente:        cliente,
+		sequenceNumber: 0,
+		UltimoVisitado1: Vazio,
+		UltimoVisitado2: Vazio,
+	}
 }
 
 // Lê um arquivo texto linha por linha e constrói o mapa do jogo
@@ -123,12 +136,16 @@ func jogoCarregarMapa(nome string, jogo *Jogo) error {
 
 	var sucesso bool
 	var pos = Posicoes{
-		Pos1X: jogo.PosCo1X,
-		Pos1Y: jogo.PosCo1Y,
-		Pos2X: jogo.PosCo2X,
-		Pos2Y: jogo.PosCo2Y,
+		Pos1X:          jogo.PosCo1X,
+		Pos1Y:          jogo.PosCo1Y,
+		Pos2X:          jogo.PosCo2X,
+		Pos2Y:          jogo.PosCo2Y,
+		ClientID:       jogo.JogadorAtual,
+		SequenceNumber: jogo.proximoSequenceNumber(),
 	}
-	erro := jogo.cliente.Call("DadosJogo.Inicializar", pos, &sucesso)
+	
+	// Usar retry automático para chamada de inicialização
+	erro := callRPCWithRetry(jogo.cliente, "DadosJogo.Inicializar", pos, &sucesso, 5)
 	if erro != nil {
 		return erro
 	}
