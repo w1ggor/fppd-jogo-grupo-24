@@ -1,4 +1,3 @@
-// jogo.go - Funções para manipular os elementos do jogo, como carregar o mapa e mover o personagem
 package main
 
 import (
@@ -8,12 +7,11 @@ import (
 	"time"
 )
 
-// Elemento representa qualquer objeto do mapa (parede, personagem, vegetação, etc)
 type Elemento struct {
 	simbolo  rune
 	cor      Cor
 	corFundo Cor
-	tangivel bool // Indica se o elemento bloqueia passagem
+	tangivel bool
 }
 type MoverElementoType struct {
 	jogo         *Jogo
@@ -21,32 +19,29 @@ type MoverElementoType struct {
 	x, y, dx, dy int
 }
 
-// Jogo contém o estado atual do jogo
 type Jogo struct {
-	cliente                            *rpc.Client  // cliente RPC para comunicação com o servidor
-	JogadorAtual                       int          // número do jogador atual (1 ou 2)
-	sequenceNumber                     int          // contador de sequência para comandos RPC
-	Mapa                               [][]Elemento // grade 2D representando o mapa
-	PosCo1X, PosCo1Y, PosCo2X, PosCo2Y int          // posição do comeco do personagem
-	Pos1X, Pos1Y, Pos2X, Pos2Y         int          // posição atual do personagem
-	IniFogoPosX, IniFogoPosY           int          // posição atual do inimigo de fogo
-	IniAguaPosX, IniAguaPosY           int          // posição atual do inimigo de fogo
-	UltimoVisitado1                    Elemento     // elemento que estava na posição do personagem antes de mover
+	cliente                            *rpc.Client
+	JogadorAtual                       int
+	sequenceNumber                     int
+	Mapa                               [][]Elemento
+	PosCo1X, PosCo1Y, PosCo2X, PosCo2Y int
+	Pos1X, Pos1Y, Pos2X, Pos2Y         int
+	IniFogoPosX, IniFogoPosY           int
+	IniAguaPosX, IniAguaPosY           int
+	UltimoVisitado1                    Elemento
 	UltimoVisitado2                    Elemento
 	PosPortao1XF, PosPortao1YF         int
 	PosPortao2XF, PosPortao2YF         int
 	PosPortao1XA, PosPortao1YA         int
 	PosPortao2XA, PosPortao2YA         int
-	StatusMsg                          string // mensagem para a barra de status
+	StatusMsg                          string
 }
 
-// Gera o próximo número de sequência
 func (jogo *Jogo) proximoSequenceNumber() int {
 	jogo.sequenceNumber++
 	return jogo.sequenceNumber
 }
 
-// Elementos visuais do jogo
 var (
 	PersonagemFogo = Elemento{'○', CorVermelho, CorPadrao, true}
 	PersonagemAgua = Elemento{'●', CorAzul, CorPadrao, true}
@@ -65,20 +60,16 @@ var (
 	BandeiraAgua   = Elemento{'⚑', CorAzul, CorPadrao, false}
 )
 
-// Cria e retorna uma nova instância do jogo
 func jogoNovo(numeroJogador int, cliente *rpc.Client) Jogo {
-	// O ultimo elemento visitado é inicializado como vazio
-	// pois o jogo começa com o personagem em uma posição vazia
 	return Jogo{
-		JogadorAtual:   numeroJogador,
-		cliente:        cliente,
-		sequenceNumber: 0,
+		JogadorAtual:    numeroJogador,
+		cliente:         cliente,
+		sequenceNumber:  0,
 		UltimoVisitado1: Vazio,
 		UltimoVisitado2: Vazio,
 	}
 }
 
-// Lê um arquivo texto linha por linha e constrói o mapa do jogo
 func jogoCarregarMapa(nome string, jogo *Jogo) error {
 	arq, err := os.Open(nome)
 	if err != nil {
@@ -97,11 +88,11 @@ func jogoCarregarMapa(nome string, jogo *Jogo) error {
 			case Parede.simbolo:
 				e = Parede
 			case InimigoFogo.simbolo:
-				jogo.IniFogoPosX, jogo.IniFogoPosY = x, y // registra a posição inicial do inimigo de fogo
-				e = Vazio                                 // remove o símbolo do inimigo do mapa
+				jogo.IniFogoPosX, jogo.IniFogoPosY = x, y
+				e = Vazio
 			case InimigoAgua.simbolo:
-				jogo.IniAguaPosX, jogo.IniAguaPosY = x, y // registra a posição inicial do inimigo de água
-				e = Vazio                                 // remove o símbolo do inimigo do mapa
+				jogo.IniAguaPosX, jogo.IniAguaPosY = x, y
+				e = Vazio
 			case Portao.simbolo:
 				e = Portao
 			case Botao.simbolo:
@@ -113,7 +104,7 @@ func jogoCarregarMapa(nome string, jogo *Jogo) error {
 				jogo.Pos1X, jogo.Pos1Y = x, y
 			case PersonagemAgua.simbolo:
 				jogo.PosCo2X, jogo.PosCo2Y = x, y
-				jogo.Pos2X, jogo.Pos2Y = x, y // registra a posição inicial do personagem                             // remove o símbolo do inimigo do mapa
+				jogo.Pos2X, jogo.Pos2Y = x, y
 			case Fogo.simbolo:
 				e = Fogo
 			case Agua.simbolo:
@@ -143,33 +134,27 @@ func jogoCarregarMapa(nome string, jogo *Jogo) error {
 		ClientID:       jogo.JogadorAtual,
 		SequenceNumber: jogo.proximoSequenceNumber(),
 	}
-	
-	// Usar retry automático para chamada de inicialização
-	erro := callRPCWithRetry(jogo.cliente, "DadosJogo.Inicializar", pos, &sucesso, 5)
+
+	erro := ChamarRPC(jogo.cliente, "DadosJogo.Inicializar", pos, &sucesso, 5)
 	if erro != nil {
 		return erro
 	}
 	return nil
 }
 
-// Verifica se o personagem pode se mover para a posição (x, y)
 func jogoPodeMoverPara(jogo *Jogo, x, y int, player ...int) bool {
-	// Verifica se a coordenada Y está dentro dos limites verticais do mapa
 	if y < 0 || y >= len(jogo.Mapa) {
 		return false
 	}
 
-	// Verifica se a coordenada X está dentro dos limites horizontais do mapa
 	if x < 0 || x >= len(jogo.Mapa[y]) {
 		return false
 	}
 
-	// Verifica se o elemento de destino é tangível (bloqueia passagem)
 	if jogo.Mapa[y][x].tangivel {
 		return false
 	}
 
-	// Verifica se o elemento de destino é tangível (bloqueia passagem)
 	if jogo.Mapa[y][x].simbolo == Agua.simbolo && player != nil && player[0] == 0 {
 		apagarFogo(jogo)
 		return false
@@ -189,13 +174,11 @@ func jogoPodeMoverPara(jogo *Jogo, x, y int, player ...int) bool {
 		player2Vence <- true
 		return true
 	}
-	// Pode mover para a posição
 	return true
 }
 
 var moveElemento = make(chan MoverElementoType, 1)
 
-// Move um elemento para a nova posição
 func jogoMoverElemento() {
 	for {
 		var moveInput = <-moveElemento
@@ -203,17 +186,14 @@ func jogoMoverElemento() {
 		var player, x, y, dx, dy = moveInput.player, moveInput.x, moveInput.y, moveInput.dx, moveInput.dy
 		nx, ny := x+dx, y+dy
 
-		// Verificações de limites
 		if ny < 0 || ny >= len(jogo.Mapa) || nx < 0 || nx >= len(jogo.Mapa[ny]) {
 			continue
 		}
 
-		// Não mover se destino for barreira de água ou fogo
 		if jogo.Mapa[ny][nx].simbolo == Agua.simbolo || jogo.Mapa[ny][nx].simbolo == Fogo.simbolo {
 			continue
 		}
 
-		// Não sobrescrever barreiras nem salvar barreira em UltimoVisitado
 		if jogo.Mapa[y][x].simbolo == Agua.simbolo || jogo.Mapa[y][x].simbolo == Fogo.simbolo {
 			continue
 		}
@@ -230,18 +210,17 @@ func jogoMoverElemento() {
 			continue
 		}
 
-		elemento := jogo.Mapa[y][x] // guarda o conteúdo atual da posição
+		elemento := jogo.Mapa[y][x]
 
 		if player == 0 {
-			jogo.Mapa[y][x] = jogo.UltimoVisitado1   // restaura o conteúdo anterior
-			jogo.UltimoVisitado1 = jogo.Mapa[ny][nx] // guarda o conteúdo atual da nova posição
+			jogo.Mapa[y][x] = jogo.UltimoVisitado1
+			jogo.UltimoVisitado1 = jogo.Mapa[ny][nx]
 			jogo.Mapa[ny][nx] = elemento
 		} else if player == 1 {
-			jogo.Mapa[y][x] = jogo.UltimoVisitado2   // restaura o conteúdo anterior
-			jogo.UltimoVisitado2 = jogo.Mapa[ny][nx] // guarda o conteúdo atual da nova posição
+			jogo.Mapa[y][x] = jogo.UltimoVisitado2
+			jogo.UltimoVisitado2 = jogo.Mapa[ny][nx]
 			jogo.Mapa[ny][nx] = elemento
 		} else {
-			// Inimigos ou outros elementos
 			jogo.Mapa[y][x] = Vazio
 			jogo.Mapa[ny][nx] = elemento
 		}

@@ -1,5 +1,3 @@
-// inimigo.go - Funções para movimentação e ações do inimigo
-
 package main
 
 import "time"
@@ -9,7 +7,6 @@ func inimigoMover(input InputData, jogo *Jogo, inimigo int) {
 	if inimigo == 0 {
 		fdx, fdy := input.dx, input.dy
 		nx, ny := jogo.IniFogoPosX+fdx, jogo.IniFogoPosY+fdy
-		// Verifica se o movimento é permitido e realiza a movimentação
 		if jogoPodeMoverPara(jogo, nx, ny) {
 			var moveInput = MoverElementoType{player: 4, jogo: jogo, x: jogo.IniFogoPosX, y: jogo.IniFogoPosY, dx: fdx, dy: fdy}
 			moveElemento <- moveInput
@@ -18,7 +15,6 @@ func inimigoMover(input InputData, jogo *Jogo, inimigo int) {
 	} else {
 		adx, ady := input.dx, input.dy
 		nx, ny := jogo.IniAguaPosX+adx, jogo.IniAguaPosY+ady
-		// Verifica se o movimento é permitido e realiza a movimentação
 		if jogoPodeMoverPara(jogo, nx, ny) {
 			var moveInput = MoverElementoType{player: 4, jogo: jogo, x: jogo.IniAguaPosX, y: jogo.IniAguaPosY, dx: adx, dy: ady}
 			moveElemento <- moveInput
@@ -28,15 +24,12 @@ func inimigoMover(input InputData, jogo *Jogo, inimigo int) {
 
 }
 
-// Canal para patrulha automática
 var IniFogoPatrulha = make(chan InputData)
 var IniAguaPatrulha = make(chan InputData)
 
-// Canal de alerta para aumentar velocidade
 var IniFogoAlerta = make(chan bool)
 var IniAguaAlerta = make(chan bool)
 
-// Goroutine do inimigo: escuta patrulha automática e comandos externos
 func inimigoRecebeInput(player int, jogo *Jogo) {
 	var patrulhaChan chan InputData
 	if player == 0 {
@@ -46,13 +39,11 @@ func inimigoRecebeInput(player int, jogo *Jogo) {
 	}
 	for {
 		input := <-patrulhaChan
-		// Movimento automático de patrulha
 		inimigoMover(input, jogo, player)
 
 	}
 }
 
-// Alterna entre patrulha e alerta
 func inimigoPatrulha(player int, jogo *Jogo) {
 	var patrulhaChan chan InputData
 	var alertaChan chan bool
@@ -63,19 +54,18 @@ func inimigoPatrulha(player int, jogo *Jogo) {
 		patrulhaChan = IniAguaPatrulha
 		alertaChan = IniAguaAlerta
 	}
-	dx := 1           // cada inimigo tem sua própria direção
-	velocidade := 500 // ms
+	dx := 1
+	velocidade := 500
 	emAlerta := false
 	for {
 		select {
 		case emAlerta = <-alertaChan:
 			if emAlerta {
-				velocidade = 35 // mais rápido
+				velocidade = 35
 			} else {
-				velocidade = 500 // normal
+				velocidade = 500
 			}
 		default:
-			// segue lógica normal
 		}
 		var nx, ny int
 		if player == 0 {
@@ -92,7 +82,6 @@ func inimigoPatrulha(player int, jogo *Jogo) {
 	}
 }
 
-// Função utilitária para dormir em milissegundos
 func sleepMs(ms int) {
 	time.Sleep(time.Duration(ms) * time.Millisecond)
 }

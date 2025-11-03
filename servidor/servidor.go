@@ -7,17 +7,15 @@ import (
 	"sync"
 )
 
-// Estrutura para cache de comandos já processados (exactly-once)
 type ComandoProcessado struct {
 	SequenceNumber int
 	Resultado      bool
 }
 
 type DadosJogo struct {
-	player1, player2 bool
-	posicaoJogadores Posicoes
-	mu               sync.Mutex
-	// Cache de comandos processados por cliente (ClientID -> último SequenceNumber)
+	player1, player2    bool
+	posicaoJogadores    Posicoes
+	mu                  sync.Mutex
 	comandosProcessados map[int]map[int]*ComandoProcessado
 }
 type Posicoes struct {
@@ -34,7 +32,6 @@ func (s *DadosJogo) Inicializar(dados Inicializar, sucesso *bool) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	// Verifica se comando já foi processado (exactly-once)
 	if s.comandosProcessados[dados.ClientID] != nil {
 		if cmd, existe := s.comandosProcessados[dados.ClientID][dados.SequenceNumber]; existe {
 			*sucesso = cmd.Resultado
@@ -45,14 +42,12 @@ func (s *DadosJogo) Inicializar(dados Inicializar, sucesso *bool) error {
 		s.comandosProcessados[dados.ClientID] = make(map[int]*ComandoProcessado)
 	}
 
-	// Processa o comando
 	s.posicaoJogadores.Pos1X = dados.Pos1X
 	s.posicaoJogadores.Pos1Y = dados.Pos1Y
 	s.posicaoJogadores.Pos2X = dados.Pos2X
 	s.posicaoJogadores.Pos2Y = dados.Pos2Y
 	*sucesso = true
 
-	// Registra comando como processado
 	s.comandosProcessados[dados.ClientID][dados.SequenceNumber] = &ComandoProcessado{
 		SequenceNumber: dados.SequenceNumber,
 		Resultado:      true,
@@ -105,15 +100,14 @@ func (s *DadosJogo) GetPosicoes(player int, resposta *Posicoes) error {
 type MoverElementoType struct {
 	Player         int
 	X, Y           int
-	ClientID       int // ID único do cliente (1 ou 2)
-	SequenceNumber int // Número de sequência do comando
+	ClientID       int
+	SequenceNumber int
 }
 
 func (s *DadosJogo) MoverJogador(dados MoverElementoType, sucesso *bool) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	// Verifica se comando já foi processado (exactly-once)
 	if s.comandosProcessados[dados.ClientID] != nil {
 		if cmd, existe := s.comandosProcessados[dados.ClientID][dados.SequenceNumber]; existe {
 			*sucesso = cmd.Resultado
@@ -124,7 +118,6 @@ func (s *DadosJogo) MoverJogador(dados MoverElementoType, sucesso *bool) error {
 		s.comandosProcessados[dados.ClientID] = make(map[int]*ComandoProcessado)
 	}
 
-	// Processa o comando
 	if dados.Player == 1 {
 		s.posicaoJogadores.Pos1X = dados.X
 		s.posicaoJogadores.Pos1Y = dados.Y
@@ -136,7 +129,6 @@ func (s *DadosJogo) MoverJogador(dados MoverElementoType, sucesso *bool) error {
 	}
 	*sucesso = true
 
-	// Registra comando como processado
 	s.comandosProcessados[dados.ClientID][dados.SequenceNumber] = &ComandoProcessado{
 		SequenceNumber: dados.SequenceNumber,
 		Resultado:      true,
