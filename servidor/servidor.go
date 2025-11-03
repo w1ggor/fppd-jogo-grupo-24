@@ -62,7 +62,9 @@ func (s *DadosJogo) Inicializar(dados Inicializar, sucesso *bool) error {
 	return nil
 }
 
-func (s DadosJogo) Disconnect(clientId int, sucesso *bool) error {
+func (s *DadosJogo) Disconnect(clientId int, sucesso *bool) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	if clientId == 1 {
 		s.player1 = false
 		fmt.Println("Jogador 1 desconectado")
