@@ -33,7 +33,7 @@ type Inicializar struct {
 func (s *DadosJogo) Inicializar(dados Inicializar, sucesso *bool) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	
+
 	// Verifica se comando já foi processado (exactly-once)
 	if s.comandosProcessados[dados.ClientID] != nil {
 		if cmd, existe := s.comandosProcessados[dados.ClientID][dados.SequenceNumber]; existe {
@@ -44,21 +44,33 @@ func (s *DadosJogo) Inicializar(dados Inicializar, sucesso *bool) error {
 	} else {
 		s.comandosProcessados[dados.ClientID] = make(map[int]*ComandoProcessado)
 	}
-	
+
 	// Processa o comando
 	s.posicaoJogadores.Pos1X = dados.Pos1X
 	s.posicaoJogadores.Pos1Y = dados.Pos1Y
 	s.posicaoJogadores.Pos2X = dados.Pos2X
 	s.posicaoJogadores.Pos2Y = dados.Pos2Y
 	*sucesso = true
-	
+
 	// Registra comando como processado
 	s.comandosProcessados[dados.ClientID][dados.SequenceNumber] = &ComandoProcessado{
 		SequenceNumber: dados.SequenceNumber,
 		Resultado:      true,
 	}
-	
+
 	fmt.Printf("Inicialização processada - ClientID: %d, SeqNum: %d\n", dados.ClientID, dados.SequenceNumber)
+	return nil
+}
+
+func (s DadosJogo) Disconnect(clientId int, sucesso *bool) error {
+	if clientId == 1 {
+		s.player1 = false
+		fmt.Println("Jogador 1 desconectado")
+	} else if clientId == 2 {
+		s.player2 = false
+		fmt.Println("Jogador 2 desconectado")
+	}
+	*sucesso = true
 	return nil
 }
 
@@ -98,7 +110,7 @@ type MoverElementoType struct {
 func (s *DadosJogo) MoverJogador(dados MoverElementoType, sucesso *bool) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	
+
 	// Verifica se comando já foi processado (exactly-once)
 	if s.comandosProcessados[dados.ClientID] != nil {
 		if cmd, existe := s.comandosProcessados[dados.ClientID][dados.SequenceNumber]; existe {
@@ -109,7 +121,7 @@ func (s *DadosJogo) MoverJogador(dados MoverElementoType, sucesso *bool) error {
 	} else {
 		s.comandosProcessados[dados.ClientID] = make(map[int]*ComandoProcessado)
 	}
-	
+
 	// Processa o comando
 	if dados.Player == 1 {
 		s.posicaoJogadores.Pos1X = dados.X
@@ -121,13 +133,13 @@ func (s *DadosJogo) MoverJogador(dados MoverElementoType, sucesso *bool) error {
 		fmt.Printf("Movimentação do Jogador 2 para: (%d, %d) - SeqNum: %d\n", dados.X, dados.Y, dados.SequenceNumber)
 	}
 	*sucesso = true
-	
+
 	// Registra comando como processado
 	s.comandosProcessados[dados.ClientID][dados.SequenceNumber] = &ComandoProcessado{
 		SequenceNumber: dados.SequenceNumber,
 		Resultado:      true,
 	}
-	
+
 	return nil
 }
 

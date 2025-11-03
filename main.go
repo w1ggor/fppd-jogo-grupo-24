@@ -51,6 +51,14 @@ func callRPCWithRetry(client *rpc.Client, method string, args interface{}, reply
 	return fmt.Errorf("falha após %d tentativas: %w", maxRetries, err)
 }
 
+func disconnect(client *rpc.Client, clientId int) {
+	var sucesso bool
+	err := callRPCWithRetry(client, "DadosJogo.Disconnect", clientId, &sucesso, 3)
+	if err != nil {
+		fmt.Println("Erro ao desconectar do servidor:", err)
+	}
+}
+
 func main() {
 
 	// Inicializa a interface (termbox)
@@ -74,6 +82,7 @@ func main() {
 		return
 	}
 	defer client.Close()
+
 	// solicita o número do jogador
 	var numeroJogador int
 	err = callRPCWithRetry(client, "DadosJogo.ConectarJogador", true, &numeroJogador, 5)
@@ -81,6 +90,7 @@ func main() {
 		fmt.Println("Erro ao conectar como jogador:", err)
 		return
 	}
+	defer disconnect(client, numeroJogador)
 	if numeroJogador == -1 {
 		fmt.Println("Servidor cheio. Não foi possível conectar como jogador.")
 		return
