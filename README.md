@@ -117,7 +117,122 @@ Foram implementados dois inimigos no jogo: o inimigo de fogo (◇) e o inimigo d
 - **Sincronização:** Toda movimentação dos inimigos também é feita via canal, garantindo concorrência segura.
 
 Essas alterações demonstram comunicação entre elementos do jogo por canais, escuta concorrente e lógica reativa baseada em eventos do ambiente.
-### Botões que abrem e fecham portões 
+### Botões que abrem e fecham portões
+
+### Comunicação Cliente-Servidor via RPC
+
+Foi implementada uma arquitetura cliente-servidor utilizando **RPC (Remote Procedure Call)** do Go para permitir que dois jogadores em máquinas diferentes joguem juntos de forma sincronizada.
+
+#### Estrutura do Servidor
+
+O servidor (`servidor/servidor.go`) gerencia o estado compartilhado do jogo:
+
+- **Conexão de jogadores:** O servidor aceita até 2 jogadores. Cada jogador recebe um ID único (1 ou 2) ao conectar.
+- **Sincronização de posições:** O servidor mantém as posições atualizadas de ambos os personagens e responde a requisições RPC dos clientes.
+- **Exactly-once semantics:** Implementa controle de sequência para garantir que comandos duplicados (em caso de retransmissão) não sejam executados múltiplas vezes.
+- **Cache de comandos:** Mantém um cache de comandos já processados por cliente para evitar reexecução em caso de falha de rede.
+
+```go
+// servidor/servidor.go
+type DadosJogo struct {
+    player1, player2     bool
+    posicaoJogadores     Posicoes
+    mu                   sync.Mutex
+    comandosProcessados  map[int]map[int]*ComandoProcessado
+}
+```
+
+**Métodos RPC disponíveis:**
+
+- `ConectarJogador`: Conecta um novo jogador e retorna seu ID
+- `Disconnect`: Desconecta um jogador e libera seu slot
+- `Inicializar`: Recebe as posições iniciais do mapa
+- `MoverJogador`: Atualiza a posição de um jogador
+- `GetPosicoes`: Retorna as posições atualizadas de ambos os jogadores
+
+#### Estrutura do Cliente
+
+Cada cliente mantém uma conexão RPC com o servidor:
+
+- **Retry automático:** Todas as chamadas RPC possuem retry automático com backoff exponencial em caso de falha de rede
+- **Sequence numbers:** Cada comando que modifica estado inclui um número de sequência incremental para garantir exactly-once
+- **Sincronização periódica:** Uma goroutine busca as posições do outro jogador a cada 16ms via RPC
+
+```go
+// main.go
+func callRPCWithRetry(client *rpc.Client, method string, args interface{}, 
+                      reply interface{}, maxRetries int) error {
+    for tentativa := 0; tentativa < maxRetries; tentativa++ {
+        err = client.Call(method, args, reply)
+        if err == nil {
+            return nil
+        }
+        time.Sleep(time.Duration(tentativa+1) * 100 * time.Millisecond)
+    }
+    return fmt.Errorf("falha após %d tentativas: %w", maxRetries, err)
+}
+```
+
+**Structs RPC com sequence numbers:**
+
+```go
+type MoverElementoTypeRPC struct {
+    Player         int
+    X, Y           int
+    ClientID       int
+    SequenceNumber int
+}
+```
+
+#### Como executar em modo multiplayer
+
+1. **Inicie o servidor** em uma máquina:
+
+```bash
+# Compile o servidor
+cd servidor
+go build -o servidor.exe .
+
+# Execute o servidor
+./servidor.exe
+```
+
+O servidor ficará aguardando conexões na porta **8973**.
+
+2. **Execute o cliente** em cada máquina jogadora (até 2 jogadores):
+
+```bash
+# Compile o cliente
+go build -o jogo.exe .
+
+# Execute informando o IP do servidor
+./jogo.exe 127.0.0.1          # Para servidor local
+./jogo.exe 192.168.1.100      # Para servidor em outra máquina
+```
+
+#### Garantias de confiabilidade
+
+- **Retry automático:** Até 5 tentativas para conexão inicial, 3 tentativas para movimentos
+- **Backoff exponencial:** Delay aumenta progressivamente entre tentativas (100ms, 200ms, 300ms...)
+- **Exactly-once execution:** Comandos duplicados são detectados e ignorados pelo servidor
+- **Thread-safe:** Todas as operações no servidor são protegidas por mutex
+- **Desconexão graciosa:** Ao sair do jogo (ESC), o cliente notifica o servidor para liberar o slot
+
+#### Logs e debugging
+
+O servidor exibe logs detalhados:
+
+```
+Servidor aguardando conexões na porta 8973
+Jogador 1 conectado
+Inicialização processada - ClientID: 1, SeqNum: 1
+Movimentação do Jogador 1 para: (32, 5) - SeqNum: 2
+Jogador 2 conectado
+Movimento duplicado detectado - ClientID: 1, SeqNum: 2 (ignorado)
+Jogador 1 desconectado
+```
+
+Essa implementação demonstra comunicação distribuída, tolerância a falhas, sincronização de estado compartilhado e garantias de exactly-once semantics em sistemas cliente-servidor. 
 Foram implementados dois botões e dois portões interativos em cada um dos lados do mapa. Quando o jogador fica em cima do botão de um lado, o portão do lado oposto irá abrir. Quando ele sai, o portão irá fechar novamente.
 
 O portão fechará apenas após abrir por completo.
@@ -218,3 +333,4 @@ func jogoMoverElemento() {
 ## Há controle de exclusão mútua nas regiões críticas do jogo utilizando canais 
 - Sincronização do mapa
 - Controle dos portões
+
