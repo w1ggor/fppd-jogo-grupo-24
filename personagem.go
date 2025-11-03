@@ -101,8 +101,8 @@ func vencerJogo(jogo *Jogo) {
 
 	jogador1chegou := false
 	jogador2chegou := false
-	jogo.StatusMsg = "Voces tem 30 segundos para chegar nas bandeiras juntos "
-	go avisoTempo(jogo)
+	jogo.StatusMsg = "Voces precisam chegar nas bandeiras juntos "
+
 	for !jogador1chegou || !jogador2chegou {
 
 		select {
@@ -110,12 +110,6 @@ func vencerJogo(jogo *Jogo) {
 			jogador1chegou = true
 		case <-player2Vence:
 			jogador2chegou = true
-		case <-time.After(30 * time.Second):
-			jogo.StatusMsg = "Voces Perderam!"
-			time.Sleep(time.Second * 2)
-			resetPersonagens(jogo)
-			vencerJogo(jogo)
-			return // Se timeout, sai sem definir mensagem de vitória
 		}
 	}
 
@@ -124,10 +118,7 @@ func vencerJogo(jogo *Jogo) {
 	resetPersonagens(jogo)
 	vencerJogo(jogo)
 }
-func avisoTempo(jogo *Jogo) {
-	time.Sleep(15 * time.Second)
-	jogo.StatusMsg = "Faltam 15 segundos!"
-}
+
 func resetPersonagens(jogo *Jogo) {
 	jogo.Pos1X, jogo.Pos1Y = jogo.PosCo1X, jogo.PosCo1Y
 	jogo.Pos2X, jogo.Pos2Y = jogo.PosCo2X, jogo.PosCo2Y
