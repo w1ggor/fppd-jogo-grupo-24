@@ -108,9 +108,23 @@ func main() {
 			if numeroJogador == 1 {
 				jogo.Pos2X = posicoes.Pos2X
 				jogo.Pos2Y = posicoes.Pos2Y
+				if jogo.Mapa[jogo.Pos2Y][jogo.Pos2X].simbolo == BandeiraAgua.simbolo {
+					// Se eu sou o jogador 1, o jogador 2 venceu
+					if jogo.JogadorAtual == 1 {
+						jogo.StatusMsg = "JOGADOR 2 (ÁGUA) VENCEU!"
+						player2Vence <- true
+					}
+				}
 			} else if numeroJogador == 2 {
 				jogo.Pos1X = posicoes.Pos1X
 				jogo.Pos1Y = posicoes.Pos1Y
+				if jogo.Mapa[jogo.Pos1Y][jogo.Pos1X].simbolo == BandeiraFogo.simbolo {
+					// Se eu sou o jogador 2, o jogador 1 venceu
+					if jogo.JogadorAtual == 2 {
+						jogo.StatusMsg = "JOGADOR 1 (FOGO) VENCEU!"
+						player1Vence <- true
+					}
+				}
 			}
 
 			time.Sleep(16 * time.Millisecond)
