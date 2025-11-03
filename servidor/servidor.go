@@ -15,6 +15,7 @@ type DadosJogo struct {
 type Posicoes struct {
 	Pos1X, Pos1Y, Pos2X, Pos2Y int
 }
+
 type Inicializar struct {
 	Pos1X, Pos1Y, Pos2X, Pos2Y int
 }
@@ -59,7 +60,7 @@ type MoverElementoType struct {
 	X, Y   int
 }
 
-func (s *DadosJogo) MoverElemento(dados MoverElementoType, sucesso *bool) error {
+func (s *DadosJogo) MoverJogador(dados MoverElementoType, sucesso *bool) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if dados.Player == 1 {
