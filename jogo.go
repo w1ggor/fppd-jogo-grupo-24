@@ -121,6 +121,17 @@ func jogoCarregarMapa(nome string, jogo *Jogo) error {
 		return err
 	}
 
+	var sucesso bool
+	var pos = Posicoes{
+		Pos1X: jogo.PosCo1X,
+		Pos1Y: jogo.PosCo1Y,
+		Pos2X: jogo.PosCo2X,
+		Pos2Y: jogo.PosCo2Y,
+	}
+	erro := jogo.cliente.Call("DadosJogo.Inicializar", pos, &sucesso)
+	if erro != nil {
+		return erro
+	}
 	return nil
 }
 
